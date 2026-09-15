@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ASD 康复陪伴机器人 · 三人执行计划</title>
+  <style>
+    :root {
+      --bg: #e8f0ec;
+      --fg: #152820;
+      --muted: #4d6358;
+      --card: #f7fbf8;
+      --line: #b9cfc4;
+      --accent: #1f6b54;
+      --accent2: #c45c26;
+      --soft: #d3e8de;
+      --warn-bg: #fff6e8;
+      --warn: #8a5a00;
+      --ok: #1a6b45;
+      --shadow: 0 10px 30px rgba(21, 40, 32, 0.08);
+      --font-display: "Source Han Serif SC", "Noto Serif SC", "Songti SC", "SimSun", serif;
+      --font-body: "IBM Plex Sans", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--fg);
+      font-family: var(--font-body);
+      line-height: 1.65;
+      background:
+        radial-gradient(1100px 520px at 8% -10%, #cfe6da 0%, transparent 55%),
+        radial-gradient(900px 480px at 100% 0%, #f0e2d4 0%, transparent 48%),
+        linear-gradient(180deg, #f3f7f4 0%, var(--bg) 40%, #e4efe9 100%);
+    }
+    a { color: var(--accent); }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 18px 80px; }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 36px 28px 28px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.88), rgba(231,243,237,0.92)),
+        repeating-linear-gradient(-18deg, transparent, transparent 12px, rgba(31,107,84,0.03) 12px, rgba(31,107,84,0.03) 13px);
+      box-shadow: var(--shadow);
+      margin-bottom: 22px;
+      animation: rise 0.7s ease-out both;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -40px; top: -40px;
+      width: 220px; height: 220px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(196,92,38,0.18), transparent 70%);
+      pointer-events: none;
+    }
+    .brand {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 4vw, 2.55rem);
+      letter-spacing: 0.02em;
+      margin: 0 0 10px;
+      line-height: 1.25;
+    }
+    .tagline { color: var(--muted); max-width: 46rem; margin: 0 0 18px; }
+    .meta {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+    .chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px; border-radius: 999px;
+      border: 1px solid var(--line); background: #fff;
+      font-size: 0.86rem; color: var(--muted);
+    }
+    .chip strong { color: var(--fg); font-weight: 600; }
+    nav.toc {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin: 18px 0 8px;
+      position: sticky; top: 0; z-index: 5;
+      padding: 10px 0;
+      background: linear-gradient(180deg, rgba(243,247,244,0.96), rgba(243,247,244,0.88));
+      backdrop-filter: blur(8px);
+    }
+    nav.toc a {
+      text-decoration: none;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--fg);
+      font-size: 0.88rem;
+      transition: background 0.2s, transform 0.2s;
+    }
+    nav.toc a:hover { background: var(--soft); transform: translateY(-1px); }
+    section.block {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 22px 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+      animation: rise 0.55s ease-out both;
+    }
+    section.block:nth-of-type(2) { animation-delay: 0.05s; }
+    section.block:nth-of-type(3) { animation-delay: 0.1s; }
+    section.block:nth-of-type(4) { animation-delay: 0.15s; }
+    h2 {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      margin: 0 0 12px;
+      border-bottom: 2px solid var(--soft);
+      padding-bottom: 8px;
+    }
+    h3 { font-size: 1.02rem; margin: 18px 0 8px; color: var(--accent); }
+    p, li { color: var(--fg); }
+    .muted { color: var(--muted); }
+    .banner {
+      background: var(--warn-bg);
+      border-left: 4px solid var(--warn);
+      padding: 12px 14px;
+      border-radius: 0 10px 10px 0;
+      margin: 0 0 14px;
+      font-size: 0.95rem;
+    }
+    .grid3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 820px) {
+      .grid3 { grid-template-columns: 1fr; }
+    }
+    .role {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      background: linear-gradient(180deg, #fff, #f1f7f4);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .role:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+    .role .who {
+      font-family: var(--font-display);
+      font-size: 1.15rem;
+      margin: 0 0 6px;
+    }
+    .role ul { margin: 8px 0 0; padding-left: 1.1rem; }
+    .role li { margin: 4px 0; font-size: 0.94rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+      overflow: hidden;
+      border-radius: 10px;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 9px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: var(--soft); font-weight: 600; }
+    tr:nth-child(even) td { background: rgba(255,255,255,0.55); }
+    .timeline {
+      display: grid;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .week {
+      display: grid;
+      grid-template-columns: 88px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+    .week .label {
+      font-weight: 700;
+      color: var(--accent);
+      font-size: 0.95rem;
+    }
+    .steps {
+      counter-reset: step;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .steps li {
+      counter-increment: step;
+      position: relative;
+      padding: 10px 12px 10px 48px;
+      margin-bottom: 8px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+    }
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 12px; top: 10px;
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      display: grid; place-items: center;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    .wire {
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+      margin: 10px 0 4px;
+    }
+    .node {
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: #fff;
+      border: 1px solid var(--line);
+      font-size: 0.9rem;
+    }
+    .arrow { color: var(--accent2); font-weight: 700; }
+    .linkbox {
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+      padding: 14px;
+      border-radius: 12px;
+      background: #16352c;
+      color: #e7f4ee;
+    }
+    .linkbox a { color: #9fe0c4; word-break: break-all; }
+    .footer {
+      margin-top: 28px;
+      color: var(--muted);
+      font-size: 0.88rem;
+      text-align: center;
+    }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media print {
+      nav.toc { position: static; }
+      .hero, section.block { box-shadow: none; break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <h1 class="brand">ASD 儿童康复陪伴机器人</h1>
+      <p class="tagline">
+        三人执行计划网页版：时间分工、功能实现、器材采买、连线与应用功能设计。
+        产品定位为<strong>非医疗</strong>竞赛/毕业样机——辅助训练与客观记录，不诊断、不治愈、不做 ASD 分级。
+      </p>
+      <div class="meta">
+        <span class="chip"><strong>周期</strong> 12 周</span>
+        <span class="chip"><strong>人力</strong> 3 人</span>
+        <span class="chip"><strong>主控</strong> RDK-X5 + ESP32 安全岛</span>
+        <span class="chip"><strong>运动</strong> 零舵机</span>
+      </div>
+    </header>
+
+    <nav class="toc" aria-label="目录">
+      <a href="#roles">三人分工</a>
+      <a href="#weeks">12 周节奏</a>
+      <a href="#features">功能顺序</a>
+      <a href="#bom">器材采买</a>
+      <a href="#wiring">连线步骤</a>
+      <a href="#app">应用设计</a>
+      <a href="#lab">实验室验证</a>
+      <a href="#share">仓库权限</a>
+    </nav>
+
+    <section class="block" id="roles">
+      <h2>一、三人分工</h2>
+      <div class="grid3">
+        <article class="role">
+          <p class="who">P1 · 硬件安全</p>
+          <p class="muted">采购与安全岛</p>
+          <ul>
+            <li>BOM 下单与到货核验</li>
+            <li>电源 / 急停 / 继电器</li>
+            <li>ESP32：灯环、功放、IMU 倾倒</li>
+            <li>台架连线与故障关断</li>
+          </ul>
+        </article>
+        <article class="role">
+          <p class="who">P2 · 端侧软件</p>
+          <p class="muted">RDK 业务主链路</p>
+          <ul>
+            <li>儿童档案与风险状态机</li>
+            <li>ASR / 个人词典 / 意图确认</li>
+            <li>感知接入与限幅安全</li>
+            <li>FastAPI 与 ESP32 UART</li>
+          </ul>
+        </article>
+        <article class="role">
+          <p class="who">P3 · 集成验收</p>
+          <p class="muted">联调、演示、标定</p>
+          <ul>
+            <li>驱动联调与管理端</li>
+            <li>L610 MQTT 断网补发</li>
+            <li>故障时序 + 声光标定</li>
+            <li>演示脚本与 pytest</li>
+          </ul>
+        </article>
+      </div>
+      <p class="muted" style="margin-top:12px;">建议每周例会 30 分钟，只对齐接口与阻塞项。</p>
+    </section>
+
+    <section class="block" id="weeks">
+      <h2>二、12 周时间节奏</h2>
+      <div class="timeline">
+        <div class="week">
+          <div class="label">W1–2</div>
+          <div>
+            <strong>启动与采购</strong>
+            <div class="muted">锁 BOM 下单；仿真全绿；电源 / Hub / 急停回路草样（P1+P2+P3）。</div>
+          </div>
+        </div>
+        <div class="week">
+          <div class="label">W3–5</div>
+          <div>
+            <strong>安全岛与外设点亮</strong>
+            <div class="muted">ESP32 心跳 / 看门狗 / 急停 / 倾倒；RDK UART；相机、麦、雷达点亮。</div>
+          </div>
+        </div>
+        <div class="week">
+          <div class="label">W6–8</div>
+          <div>
+            <strong>整机闭环</strong>
+            <div class="muted">线束共地；风险机 + 个人词典 + 限幅；管理端趋势（非诊断表述）。</div>
+          </div>
+        </div>
+        <div class="week">
+          <div class="label">W9–10</div>
+          <div>
+            <strong>台架验证</strong>
+            <div class="muted">8 类故障 × 30 次关断时序；声压 / 照度 / 亮度标定；限幅前后对比。</div>
+          </div>
+        </div>
+        <div class="week">
+          <div class="label">W11–12</div>
+          <div>
+            <strong>验收演示</strong>
+            <div class="muted">按验收清单演示收口；修阻塞；推送私有仓终版。</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" id="features">
+      <h2>三、功能实现顺序</h2>
+      <ol class="steps">
+        <li>安全许可与声光硬限幅（不可被业务覆盖）</li>
+        <li>儿童档案 + 风险融合滞回状态机</li>
+        <li>Top-K ASR / 个人词典 / 触摸确认</li>
+        <li>注视回避 · 哭声候选接入</li>
+        <li>三级任务库与安抚 / 可退出</li>
+        <li>本地 SQLite + 断网 MQTT 补发</li>
+        <li>管理端会话与周趋势（含非诊断声明）</li>
+      </ol>
+      <p class="muted">代码骨架已在仓库：<code>asd_robot/</code>、<code>safety/</code>、<code>rehab/</code>、<code>firmware/esp32/</code>、<code>lab/</code>。</p>
+    </section>
+
+    <section class="block" id="bom">
+      <h2>四、器材采买（P1 · W1 一次下单）</h2>
+      <div class="banner">到货核验：型号、接口电平、是否支持 RDK Ubuntu / Linux ARM64 驱动。</div>
+      <table>
+        <thead>
+          <tr><th>类别</th><th>推荐型号</th><th>数量</th><th>备注</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>主控</td><td>地平线 RDK-X5 8GB</td><td>1</td><td>端侧 AI</td></tr>
+          <tr><td>存储 / 散热</td><td>高耐久 128GB TF + 官方风扇套件</td><td>1</td><td>—</td></tr>
+          <tr><td>相机</td><td>Orbbec Gemini（核验 ARM64）</td><td>1</td><td>USB3 经有源 Hub</td></tr>
+          <tr><td>麦克风</td><td>ReSpeaker Mic Array v2.0 等</td><td>1</td><td>含 AEC 优先</td></tr>
+          <tr><td>毫米波</td><td>R60A 明确子型号</td><td>1</td><td>仅存在/微动</td></tr>
+          <tr><td>安全 MCU</td><td>ESP32-WROOM DevKit</td><td>1</td><td>安全岛</td></tr>
+          <tr><td>触摸 / IMU</td><td>MPR121 + MPU6050/ICM-20948</td><td>各1</td><td>真 I²C；倾倒检测</td></tr>
+          <tr><td>灯环</td><td>WS2812B + 乳白罩 + 74AHCT125</td><td>1套</td><td>禁止 PCA9685 直驱</td></tr>
+          <tr><td>音频</td><td>PAM8403 + 3W 喇叭</td><td>1套</td><td>硬件电位器先约 40%</td></tr>
+          <tr><td>急停切电</td><td>蘑菇头急停 + 5V 继电器</td><td>1套</td><td>优先切灯/功放 5V</td></tr>
+          <tr><td>通信</td><td>广和通 L610 Cat.1 开发板</td><td>1</td><td>独立供电 + MQTT</td></tr>
+          <tr><td>供电</td><td>12V 电池 + 12→5V ≥6A + 有源 USB3 Hub</td><td>1套</td><td>分支供电</td></tr>
+        </tbody>
+      </table>
+      <h3>实验室验证另购 / 借用</h3>
+      <p>4 通道示波器、IEC 61672-1 Class 2 声级计、照度计、倾角台、UART 断线开关。（手机声级计 App 不可替代。）</p>
+    </section>
+
+    <section class="block" id="wiring">
+      <h2>五、器材连线步骤</h2>
+      <div class="wire">
+        <span class="node">共地</span><span class="arrow">→</span>
+        <span class="node">稳压分支</span><span class="arrow">→</span>
+        <span class="node">急停切灯/功放</span><span class="arrow">→</span>
+        <span class="node">ESP32 外设</span><span class="arrow">→</span>
+        <span class="node">USB Hub</span><span class="arrow">→</span>
+        <span class="node">雷达/音频</span><span class="arrow">→</span>
+        <span class="node">烧录安全岛</span>
+      </div>
+      <ol>
+        <li>电池 BMS → 12V→5V 稳压；RDK / Hub / L610 分支供电，大电流就近回流。</li>
+        <li>急停 NC 切断灯带与功放 5V；NO 接入 ESP32 通知。</li>
+        <li>ESP32：I²C（MPR121 + IMU）、WS2812 经 AHCT125、UART ↔ RDK。</li>
+        <li>相机、阵列麦经有源 USB3 Hub 接入 RDK。</li>
+        <li>R60A UART；RDK 3.5mm → 限幅 → PAM8403 → 扬声器。</li>
+        <li>上电冒烟测试后烧录 <code>firmware/esp32/asd_safety_island.ino</code>。</li>
+      </ol>
+      <p><strong>禁止：</strong>舵机 / 云台；PCA9685 直接驱动 WS2812。</p>
+      <p class="muted">明细见仓库 <code>docs/HARDWARE_WIRING_FLASH.md</code>、<code>docs/HARDWARE_BOM.md</code>。</p>
+    </section>
+
+    <section class="block" id="app">
+      <h2>六、应用功能设计</h2>
+      <h3>安全优先级（不可被业务覆盖）</h3>
+      <p><code>急停 &gt; 倾倒/失联 &gt; 持续高风险 &gt; 人工暂停 &gt; 安抚 &gt; 训练 &gt; 奖励</code></p>
+      <h3>演示八场景（必达）</h3>
+      <table>
+        <thead><tr><th>#</th><th>场景</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>靠近 → 低刺激唤醒短句</td></tr>
+          <tr><td>2</td><td>入门级注视 / 触摸 / 问候训练</td></tr>
+          <tr><td>3</td><td>非典型发音 → Top-K → 触摸二选一确认</td></tr>
+          <tr><td>4</td><td>持续回避 → 降刺激</td></tr>
+          <tr><td>5</td><td>哭声 / 高唤醒 → 安抚（不可自动强行恢复训练）</td></tr>
+          <tr><td>6</td><td>长按暂停；急停 / 倾倒 → 静音熄灯</td></tr>
+          <tr><td>7</td><td>断网本地落盘；联网 MQTT 幂等补发</td></tr>
+          <tr><td>8</td><td>管理端会话与周趋势（非诊断报表）</td></tr>
+        </tbody>
+      </table>
+      <div class="banner" style="margin-top:14px;">
+        允许：不适风险 0–4、客观行为统计、相对个人基线趋势。<br/>
+        禁止：医学诊断、治愈宣称、ASD 严重程度评分、默认上传原始音视频。
+      </div>
+    </section>
+
+    <section class="block" id="lab">
+      <h2>七、实验室验证（无儿童）</h2>
+      <p>两组数据：① 故障后声光关闭时间；② 控制值 ↔ 实际声压 / 眼位照度 / 屏幕亮度。</p>
+      <p>本地跑通：</p>
+      <pre style="background:#16352c;color:#e7f4ee;padding:12px 14px;border-radius:10px;overflow:auto;">cd C:\Users\Administrator\Projects\asd-rehab-robot
+python -m lab
+# 结果：reports/lab_verification/</pre>
+      <p class="muted">说明见 <code>docs/LAB_VERIFICATION.md</code>。当前默认可为仿真协议跑通；正式验收以示波器与 IEC 声级计实测为准。属工程性能验证，非医疗有效性、非安全认证。</p>
+    </section>
+
+    <section class="block" id="share">
+      <h2>八、固定仓库与查看权限</h2>
+      <div class="linkbox">
+        <span>私有仓：</span>
+        <a href="https://github.com/zhangze6868/asd-rehab-robot" target="_blank" rel="noopener">
+          https://github.com/zhangze6868/asd-rehab-robot
+        </a>
+      </div>
+      <ol style="margin-top:14px;">
+        <li>对方发送 GitHub 用户名或绑定邮箱提出申请。</li>
+        <li>仓库 Settings → Collaborators → Add people，权限选 <strong>Read</strong>。</li>
+        <li>对方接受邀请后即可<strong>永久查看</strong>，直至仓库管理员移除。</li>
+      </ol>
+      <p class="muted">仓库保持 Private；不要改成 Public。</p>
+    </section>
+
+    <p class="footer">
+      ASD Rehab Robot · 非医疗竞赛原型执行看板 · 本地打开本文件即可查看<br/>
+      路径：<code>docs/project_plan.html</code>
+    </p>
+  </div>
+</body>
+</html>
