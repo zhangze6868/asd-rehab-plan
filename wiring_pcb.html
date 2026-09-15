@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>ASD 康复机器人 · PCB 引脚连线图</title>
+  <style>
+    :root {
+      --mask: #0d3b2e;
+      --mask2: #12553f;
+      --copper: #d4a017;
+      --copper2: #f0c14a;
+      --silk: #e8f5ef;
+      --pad: #c0c0c0;
+      --hole: #1a1a1a;
+      --gnd: #5b8def;
+      --v5: #e85d4c;
+      --v33: #50c878;
+      --sig: #f0c14a;
+      --usb: #9b7ede;
+      --bg: #0a1f18;
+      --card: #12352a;
+      --muted: #9bb5a8;
+      --accent: #7dcea0;
+      --font: "IBM Plex Sans", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      --display: "Source Han Serif SC", "Noto Serif SC", "Songti SC", serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      color: var(--silk);
+      background:
+        radial-gradient(900px 500px at 10% -10%, #1a4d3a 0%, transparent 55%),
+        radial-gradient(700px 400px at 100% 0%, #2a3a20 0%, transparent 50%),
+        var(--bg);
+      line-height: 1.55;
+    }
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 16px 72px; }
+    h1 {
+      font-family: var(--display);
+      font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+      margin: 0 0 8px;
+    }
+    .sub { color: var(--muted); margin: 0 0 18px; max-width: 48rem; }
+    .nav {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin-bottom: 18px; position: sticky; top: 0; z-index: 20;
+      padding: 10px 0; background: linear-gradient(180deg, rgba(10,31,24,.96), rgba(10,31,24,.85));
+      backdrop-filter: blur(8px);
+    }
+    .nav a, .nav button {
+      appearance: none; border: 1px solid #2f5a48; background: #174536;
+      color: var(--silk); padding: 7px 12px; border-radius: 999px;
+      text-decoration: none; font: inherit; font-size: 0.88rem; cursor: pointer;
+    }
+    .nav a:hover, .nav button:hover, .nav button.active {
+      background: var(--accent); color: #0a1f18; border-color: var(--accent);
+    }
+    .legend {
+      display: flex; flex-wrap: wrap; gap: 10px 16px;
+      margin-bottom: 14px; font-size: 0.86rem; color: var(--muted);
+    }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .sw { width: 18px; height: 4px; border-radius: 2px; display: inline-block; }
+    .panel {
+      background: var(--card);
+      border: 1px solid #2a5745;
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 18px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.25);
+    }
+    .panel h2 {
+      font-family: var(--display);
+      font-size: 1.2rem;
+      margin: 0 0 10px;
+      color: var(--accent);
+    }
+    .board-wrap {
+      overflow: auto;
+      border-radius: 12px;
+      border: 1px solid #1e4637;
+      background: #08261c;
+    }
+    svg.pcb { display: block; min-width: 980px; width: 100%; height: auto; }
+    .hint {
+      margin-top: 10px; font-size: 0.86rem; color: var(--muted);
+    }
+    .net-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .net {
+      border: 1px solid #2a5745;
+      border-radius: 10px;
+      padding: 8px 10px;
+      background: #0f2d23;
+      cursor: pointer;
+      font-size: 0.86rem;
+      transition: border-color .2s, transform .2s;
+    }
+    .net:hover, .net.on {
+      border-color: var(--copper2);
+      transform: translateY(-1px);
+    }
+    .net strong { color: var(--copper2); display: block; margin-bottom: 2px; }
+    .pin-tip {
+      position: fixed; z-index: 50; pointer-events: none;
+      background: #102820; border: 1px solid var(--copper);
+      color: var(--silk); padding: 8px 10px; border-radius: 8px;
+      font-size: 0.82rem; max-width: 260px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.35);
+      display: none;
+    }
+    .ic-body { fill: #1c1c1c; stroke: #888; stroke-width: 1; }
+    .ic-silk { fill: var(--silk); font-size: 11px; font-family: ui-monospace, Consolas, monospace; }
+    .pad-label { fill: var(--silk); font-size: 9px; font-family: ui-monospace, Consolas, monospace; }
+    .trace { fill: none; stroke-linecap: round; stroke-linejoin: round; opacity: 0.92; }
+    .trace.dim { opacity: 0.18; }
+    .trace.hot { opacity: 1; stroke-width: 3.5 !important; filter: drop-shadow(0 0 4px currentColor); }
+    .chip-block { cursor: pointer; }
+    .chip-block:hover .ic-body { stroke: var(--copper2); }
+    footer { margin-top: 24px; color: var(--muted); font-size: 0.84rem; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>PCB 形式 · 器件引脚连线图</h1>
+    <p class="sub">
+      按竞赛样机定型接线绘制：电源分配板、ESP32 安全岛、RDK 外设总线。
+      点击下方网表或图中走线可高亮同一网络。电平：RDK/ESP32 信号为 3.3V；灯带数据经 74AHCT125 升到 5V。
+    </p>
+
+    <nav class="nav">
+      <a href="index.html">← 返回执行计划</a>
+      <button type="button" class="tab active" data-tab="pwr">① 电源分配</button>
+      <button type="button" class="tab" data-tab="esp">② ESP32 安全岛</button>
+      <button type="button" class="tab" data-tab="rdk">③ RDK 外设总线</button>
+      <button type="button" id="clearNet">清除高亮</button>
+    </nav>
+
+    <div class="legend">
+      <span><i class="sw" style="background:var(--v5)"></i> +5V</span>
+      <span><i class="sw" style="background:var(--v33)"></i> +3V3</span>
+      <span><i class="sw" style="background:var(--gnd)"></i> GND</span>
+      <span><i class="sw" style="background:var(--sig)"></i> 信号</span>
+      <span><i class="sw" style="background:var(--usb)"></i> USB</span>
+      <span><i class="sw" style="background:#ff8c42"></i> 受控 5V（急停/继电器后）</span>
+    </div>
+
+    <div class="pin-tip" id="tip"></div>
+
+    <!-- ================= POWER ================= -->
+    <section class="panel tab-panel" id="tab-pwr">
+      <h2>① 电源分配 PCB（先电源后信号）</h2>
+      <div class="board-wrap">
+        <svg class="pcb" viewBox="0 0 1100 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="电源分配 PCB">
+          <defs>
+            <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#0f3328" stroke-width="1"/>
+            </pattern>
+          </defs>
+          <rect width="1100" height="520" fill="var(--mask)"/>
+          <rect x="12" y="12" width="1076" height="496" rx="8" fill="url(#grid)" stroke="#1f6b4f" stroke-width="2"/>
+          <text x="28" y="40" fill="var(--silk)" font-size="16" font-family="ui-monospace,Consolas,monospace">PWR_DIST · ASD-REHAB · TOP</text>
+          <text x="820" y="40" fill="var(--muted)" font-size="11">共地必须 · 粗线供电</text>
+
+          <!-- Battery -->
+          <g class="chip-block" data-name="12V 电池+BMS">
+            <rect class="ic-body" x="40" y="80" width="120" height="70" rx="4"/>
+            <text class="ic-silk" x="55" y="110">BAT 12V</text>
+            <text class="ic-silk" x="55" y="128">+ BMS</text>
+            <circle cx="160" cy="100" r="5" fill="var(--pad)" stroke="#666"/><circle cx="160" cy="100" r="2" fill="var(--hole)"/>
+            <circle cx="160" cy="130" r="5" fill="var(--pad)" stroke="#666"/><circle cx="160" cy="130" r="2" fill="var(--hole)"/>
+            <text class="pad-label" x="168" y="104">+</text>
+            <text class="pad-label" x="168" y="134">−</text>
+          </g>
+
+          <!-- Switch fuse -->
+          <g class="chip-block" data-name="总开关+7.5A">
+            <rect class="ic-body" x="220" y="85" width="100" height="60" rx="4"/>
+            <text class="ic-silk" x="232" y="112">SW+F7.5A</text>
+            <text class="ic-silk" x="240" y="130">主断</text>
+          </g>
+
+          <!-- Buck -->
+          <g class="chip-block" data-name="12V→5V ≥8A">
+            <rect class="ic-body" x="380" y="70" width="150" height="90" rx="4"/>
+            <text class="ic-silk" x="400" y="100">BUCK 12→5V</text>
+            <text class="ic-silk" x="410" y="118">≥8A SYNC</text>
+            <text class="pad-label" x="390" y="148">IN+</text>
+            <text class="pad-label" x="390" y="162">IN−</text>
+            <text class="pad-label" x="490" y="148">OUT+</text>
+            <text class="pad-label" x="490" y="162">OUT−</text>
+            <circle cx="380" cy="145" r="5" fill="var(--pad)"/><circle cx="380" cy="145" r="2" fill="var(--hole)"/>
+            <circle cx="380" cy="160" r="5" fill="var(--pad)"/><circle cx="380" cy="160" r="2" fill="var(--hole)"/>
+            <circle cx="530" cy="145" r="5" fill="var(--pad)"/><circle cx="530" cy="145" r="2" fill="var(--hole)"/>
+            <circle cx="530" cy="160" r="5" fill="var(--pad)"/><circle cx="530" cy="160" r="2" fill="var(--hole)"/>
+          </g>
+
+          <!-- 5V fuse -->
+          <g class="chip-block" data-name="5V 主路 8A 保险">
+            <rect class="ic-body" x="580" y="120" width="70" height="40" rx="3"/>
+            <text class="ic-silk" x="590" y="145">F8A</text>
+          </g>
+
+          <!-- Loads -->
+          <g class="chip-block" data-name="RDK-X5"><rect class="ic-body" x="720" y="60" width="110" height="50" rx="3"/><text class="ic-silk" x="740" y="90">RDK-X5</text></g>
+          <g class="chip-block" data-name="USB Hub"><rect class="ic-body" x="720" y="125" width="110" height="40" rx="3"/><text class="ic-silk" x="742" y="150">USB Hub</text></g>
+          <g class="chip-block" data-name="ESP32 5V"><rect class="ic-body" x="720" y="180" width="110" height="40" rx="3"/><text class="ic-silk" x="742" y="205">ESP32 5V</text></g>
+          <g class="chip-block" data-name="L610 5V"><rect class="ic-body" x="720" y="235" width="110" height="40" rx="3"/><text class="ic-silk" x="745" y="260">L610 5V</text></g>
+
+          <!-- Relay controlled rail -->
+          <g class="chip-block" data-name="继电器+急停受控轨">
+            <rect class="ic-body" x="880" y="120" width="170" height="120" rx="4"/>
+            <text class="ic-silk" x="900" y="150">RELAY 5V</text>
+            <text class="ic-silk" x="900" y="168">COM←5V</text>
+            <text class="ic-silk" x="900" y="186">NO→F3A</text>
+            <text class="ic-silk" x="900" y="210">ESTOP NC</text>
+            <text class="ic-silk" x="900" y="226">串受控母线</text>
+          </g>
+          <g class="chip-block" data-name="WS2812B 5V"><rect class="ic-body" x="900" y="280" width="130" height="40" rx="3"/><text class="ic-silk" x="918" y="305">WS2812 5V</text></g>
+          <g class="chip-block" data-name="PAM8403 VCC"><rect class="ic-body" x="900" y="335" width="130" height="40" rx="3"/><text class="ic-silk" x="915" y="360">PAM8403 VCC</text></g>
+
+          <!-- Traces -->
+          <path class="trace" data-net="BAT+" stroke="var(--v5)" stroke-width="4" d="M160 100 H220"/>
+          <path class="trace" data-net="BAT+" stroke="var(--v5)" stroke-width="4" d="M320 115 H380"/>
+          <path class="trace" data-net="GND" stroke="var(--gnd)" stroke-width="4" d="M160 130 H250 V200 H380 V160"/>
+          <path class="trace" data-net="GND" stroke="var(--gnd)" stroke-width="3" d="M380 160 H700 V400 H60 V130"/>
+          <path class="trace" data-net="5V" stroke="var(--v5)" stroke-width="4" d="M530 145 H580"/>
+          <path class="trace" data-net="5V" stroke="var(--v5)" stroke-width="3.5" d="M650 140 H720 V85"/>
+          <path class="trace" data-net="5V" stroke="var(--v5)" stroke-width="3" d="M680 140 V145 H720"/>
+          <path class="trace" data-net="5V" stroke="var(--v5)" stroke-width="3" d="M680 140 V200 H720"/>
+          <path class="trace" data-net="5V" stroke="var(--v5)" stroke-width="3" d="M680 140 V255 H720"/>
+          <path class="trace" data-net="5V" stroke="var(--v5)" stroke-width="3" d="M680 140 V180 H880"/>
+          <path class="trace" data-net="CTRL5V" stroke="#ff8c42" stroke-width="3.5" d="M965 240 V280 H965"/>
+          <path class="trace" data-net="CTRL5V" stroke="#ff8c42" stroke-width="3" d="M965 240 V355 H965"/>
+
+          <text x="40" y="470" fill="var(--muted)" font-size="12">注：急停按下 → 受控 5V（灯/功放）断电；RDK/Hub/ESP32/L610 主轨策略按整机安全设计保留或同步切断。</text>
+        </svg>
+      </div>
+      <div class="net-list" data-board="pwr">
+        <div class="net" data-net="BAT+"><strong>BAT+</strong>电池+ → 总开关 → BUCK IN+</div>
+        <div class="net" data-net="5V"><strong>+5V 主轨</strong>BUCK OUT → F8A → RDK / Hub / ESP32 / L610 / RELAY COM</div>
+        <div class="net" data-net="CTRL5V"><strong>受控 5V</strong>RELAY NO → F3A → WS2812 / PAM8403</div>
+        <div class="net" data-net="GND"><strong>GND 汇流</strong>电池−、BUCK、各模块共地</div>
+      </div>
+      <p class="hint">施工顺序：共地 → 稳压 → 分支保险 → 急停/继电器受控负载 → 再接信号线。</p>
+    </section>
+
+    <!-- ================= ESP32 ================= -->
+    <section class="panel tab-panel" id="tab-esp" hidden>
+      <h2>② ESP32 安全岛 PCB（引脚一一对应）</h2>
+      <div class="board-wrap">
+        <svg class="pcb" viewBox="0 0 1180 640" xmlns="http://www.w3.org/2000/svg">
+          <rect width="1180" height="640" fill="var(--mask)"/>
+          <rect x="12" y="12" width="1156" height="616" rx="8" fill="#0b2a20" stroke="#1f6b4f" stroke-width="2"/>
+          <text x="28" y="40" fill="var(--silk)" font-size="16" font-family="ui-monospace,Consolas,monospace">SAFE_ISLAND · ESP32-WROOM-32 DevKitC</text>
+
+          <!-- ESP32 footprint style -->
+          <g class="chip-block" data-name="ESP32 DevKitC">
+            <rect class="ic-body" x="430" y="160" width="200" height="320" rx="6"/>
+            <text class="ic-silk" x="470" y="200">ESP32</text>
+            <text class="ic-silk" x="455" y="220">DevKitC</text>
+            <!-- left pins -->
+            <g font-family="ui-monospace,Consolas,monospace" font-size="10" fill="var(--silk)">
+              <circle cx="430" cy="250" r="5" fill="var(--pad)"/><circle cx="430" cy="250" r="2" fill="var(--hole)"/><text x="400" y="254">3V3</text>
+              <circle cx="430" cy="280" r="5" fill="var(--pad)"/><circle cx="430" cy="280" r="2" fill="var(--hole)"/><text x="398" y="284">GND</text>
+              <circle cx="430" cy="310" r="5" fill="var(--pad)"/><circle cx="430" cy="310" r="2" fill="var(--hole)"/><text x="378" y="314">GPIO21</text>
+              <circle cx="430" cy="340" r="5" fill="var(--pad)"/><circle cx="430" cy="340" r="2" fill="var(--hole)"/><text x="378" y="344">GPIO22</text>
+              <circle cx="430" cy="370" r="5" fill="var(--pad)"/><circle cx="430" cy="370" r="2" fill="var(--hole)"/><text x="385" y="374">GPIO4</text>
+              <circle cx="430" cy="400" r="5" fill="var(--pad)"/><circle cx="430" cy="400" r="2" fill="var(--hole)"/><text x="385" y="404">GPIO5</text>
+            </g>
+            <!-- right pins -->
+            <g font-family="ui-monospace,Consolas,monospace" font-size="10" fill="var(--silk)">
+              <circle cx="630" cy="250" r="5" fill="var(--pad)"/><circle cx="630" cy="250" r="2" fill="var(--hole)"/><text x="640" y="254">GPIO18</text>
+              <circle cx="630" cy="290" r="5" fill="var(--pad)"/><circle cx="630" cy="290" r="2" fill="var(--hole)"/><text x="640" y="294">GPIO16</text>
+              <circle cx="630" cy="330" r="5" fill="var(--pad)"/><circle cx="630" cy="330" r="2" fill="var(--hole)"/><text x="640" y="334">GPIO17</text>
+              <circle cx="630" cy="380" r="5" fill="var(--pad)"/><circle cx="630" cy="380" r="2" fill="var(--hole)"/><text x="640" y="384">GPIO25</text>
+              <circle cx="630" cy="420" r="5" fill="var(--pad)"/><circle cx="630" cy="420" r="2" fill="var(--hole)"/><text x="640" y="424">GPIO26</text>
+              <circle cx="630" cy="460" r="5" fill="var(--pad)"/><circle cx="630" cy="460" r="2" fill="var(--hole)"/><text x="640" y="464">5V</text>
+            </g>
+          </g>
+
+          <!-- MPR121 -->
+          <g class="chip-block" data-name="MPR121">
+            <rect class="ic-body" x="60" y="120" width="140" height="130" rx="4"/>
+            <text class="ic-silk" x="95" y="150">MPR121</text>
+            <text class="pad-label" x="70" y="180">VCC</text>
+            <text class="pad-label" x="70" y="200">GND</text>
+            <text class="pad-label" x="70" y="220">SDA</text>
+            <text class="pad-label" x="70" y="240">SCL</text>
+            <circle cx="200" cy="176" r="4" fill="var(--pad)"/><circle cx="200" cy="196" r="4" fill="var(--pad)"/>
+            <circle cx="200" cy="216" r="4" fill="var(--pad)"/><circle cx="200" cy="236" r="4" fill="var(--pad)"/>
+          </g>
+
+          <!-- IMU -->
+          <g class="chip-block" data-name="MPU6050">
+            <rect class="ic-body" x="60" y="300" width="140" height="140" rx="4"/>
+            <text class="ic-silk" x="90" y="330">MPU6050</text>
+            <text class="pad-label" x="70" y="360">VCC</text>
+            <text class="pad-label" x="70" y="380">GND</text>
+            <text class="pad-label" x="70" y="400">SDA</text>
+            <text class="pad-label" x="70" y="420">SCL</text>
+            <circle cx="200" cy="356" r="4" fill="var(--pad)"/><circle cx="200" cy="376" r="4" fill="var(--pad)"/>
+            <circle cx="200" cy="396" r="4" fill="var(--pad)"/><circle cx="200" cy="416" r="4" fill="var(--pad)"/>
+          </g>
+
+          <!-- ESTOP -->
+          <g class="chip-block" data-name="急停 NO">
+            <rect class="ic-body" x="60" y="480" width="140" height="70" rx="4"/>
+            <text class="ic-silk" x="85" y="510">ESTOP NO</text>
+            <text class="ic-silk" x="75" y="530">→GPIO4 / GND</text>
+          </g>
+
+          <!-- AHCT125 -->
+          <g class="chip-block" data-name="74AHCT125">
+            <rect class="ic-body" x="760" y="120" width="150" height="120" rx="4"/>
+            <text class="ic-silk" x="780" y="150">74AHCT125</text>
+            <text class="pad-label" x="775" y="175">A1←</text>
+            <text class="pad-label" x="775" y="195">Y1→</text>
+            <text class="pad-label" x="775" y="215">VCC=5V</text>
+            <text class="pad-label" x="775" y="230">OE#=GND</text>
+          </g>
+
+          <!-- R330 -->
+          <g class="chip-block" data-name="330Ω">
+            <rect class="ic-body" x="700" y="220" width="40" height="20" rx="2"/>
+            <text class="ic-silk" x="705" y="234" font-size="9">330Ω</text>
+          </g>
+
+          <!-- WS2812 -->
+          <g class="chip-block" data-name="WS2812B">
+            <rect class="ic-body" x="980" y="140" width="140" height="90" rx="4"/>
+            <text class="ic-silk" x="1010" y="175">WS2812B</text>
+            <text class="pad-label" x="995" y="200">DIN / 5V / GND</text>
+          </g>
+
+          <!-- MUTE / Relay -->
+          <g class="chip-block" data-name="MUTE/继电器 IN">
+            <rect class="ic-body" x="760" y="320" width="150" height="70" rx="4"/>
+            <text class="ic-silk" x="780" y="350">MUTE / RELAY</text>
+            <text class="ic-silk" x="800" y="370">IN ← GPIO5</text>
+          </g>
+
+          <!-- RDK UART -->
+          <g class="chip-block" data-name="RDK UART">
+            <rect class="ic-body" x="760" y="420" width="150" height="80" rx="4"/>
+            <text class="ic-silk" x="790" y="450">RDK UART</text>
+            <text class="pad-label" x="775" y="470">TX → GPIO16</text>
+            <text class="pad-label" x="775" y="488">RX ← GPIO17</text>
+          </g>
+
+          <!-- Radar -->
+          <g class="chip-block" data-name="R60A">
+            <rect class="ic-body" x="980" y="400" width="140" height="100" rx="4"/>
+            <text class="ic-silk" x="1020" y="435">R60A</text>
+            <text class="pad-label" x="995" y="460">TX→GPIO26</text>
+            <text class="pad-label" x="995" y="478">RX←GPIO25</text>
+            <text class="pad-label" x="995" y="490">5V/GND</text>
+          </g>
+
+          <!-- Nets -->
+          <path class="trace" data-net="3V3" stroke="var(--v33)" stroke-width="3" d="M200 176 H300 V250 H430"/>
+          <path class="trace" data-net="3V3" stroke="var(--v33)" stroke-width="2.5" d="M200 356 H280 V250"/>
+          <path class="trace" data-net="GND" stroke="var(--gnd)" stroke-width="3" d="M200 196 H320 V280 H430"/>
+          <path class="trace" data-net="GND" stroke="var(--gnd)" stroke-width="2.5" d="M200 376 H300 V280"/>
+          <path class="trace" data-net="I2C_SDA" stroke="var(--sig)" stroke-width="2.5" d="M200 216 H350 V310 H430"/>
+          <path class="trace" data-net="I2C_SDA" stroke="var(--sig)" stroke-width="2" d="M200 396 H340 V310"/>
+          <path class="trace" data-net="I2C_SCL" stroke="#ffb347" stroke-width="2.5" d="M200 236 H360 V340 H430"/>
+          <path class="trace" data-net="I2C_SCL" stroke="#ffb347" stroke-width="2" d="M200 416 H350 V340"/>
+          <path class="trace" data-net="ESTOP" stroke="#ff6b6b" stroke-width="2.5" d="M200 515 H300 V370 H430"/>
+          <path class="trace" data-net="MUTE" stroke="#ff8c42" stroke-width="2.5" d="M430 400 H700 V355 H760"/>
+          <path class="trace" data-net="LED_DATA" stroke="var(--sig)" stroke-width="2.5" d="M630 250 H700 V230 H720"/>
+          <path class="trace" data-net="LED_DATA" stroke="var(--sig)" stroke-width="2.5" d="M740 230 H760 V175"/>
+          <path class="trace" data-net="LED_DATA" stroke="var(--sig)" stroke-width="2.5" d="M910 185 H980"/>
+          <path class="trace" data-net="UART_RDK" stroke="#7dd3fc" stroke-width="2.5" d="M630 290 H720 V450 H760"/>
+          <path class="trace" data-net="UART_RDK" stroke="#7dd3fc" stroke-width="2" d="M630 330 H700 V470 H760"/>
+          <path class="trace" data-net="UART_RADAR" stroke="#c4b5fd" stroke-width="2.5" d="M630 380 H900 V440 H980"/>
+          <path class="trace" data-net="UART_RADAR" stroke="#c4b5fd" stroke-width="2" d="M630 420 H880 V470 H980"/>
+
+          <text x="28" y="600" fill="var(--muted)" font-size="12">固件：PIN_ESTOP=4 · PIN_MUTE=5 · PIN_LED_DATA=18 · UART2 RX16/TX17 · 雷达可选 25/26（交叉）</text>
+        </svg>
+      </div>
+      <div class="net-list" data-board="esp">
+        <div class="net" data-net="3V3"><strong>3V3</strong>ESP32 3V3 → MPR121 VCC · MPU6050 VCC</div>
+        <div class="net" data-net="I2C_SDA"><strong>I²C SDA</strong>GPIO21 ↔ MPR121 SDA · IMU SDA</div>
+        <div class="net" data-net="I2C_SCL"><strong>I²C SCL</strong>GPIO22 ↔ MPR121 SCL · IMU SCL</div>
+        <div class="net" data-net="ESTOP"><strong>ESTOP</strong>急停 NO → GPIO4（另一端 GND）</div>
+        <div class="net" data-net="MUTE"><strong>MUTE</strong>GPIO5 → PAM8403 MUTE / 继电器 IN</div>
+        <div class="net" data-net="LED_DATA"><strong>LED_DATA</strong>GPIO18 → 330Ω → AHCT125 A1 → Y1 → WS2812 DIN</div>
+        <div class="net" data-net="UART_RDK"><strong>UART↔RDK</strong>GPIO16←RDK TX · GPIO17→RDK RX</div>
+        <div class="net" data-net="UART_RADAR"><strong>UART↔R60A</strong>GPIO26←雷达 TX · GPIO25→雷达 RX</div>
+        <div class="net" data-net="GND"><strong>GND</strong>安全岛各模块共地</div>
+      </div>
+    </section>
+
+    <!-- ================= RDK ================= -->
+    <section class="panel tab-panel" id="tab-rdk" hidden>
+      <h2>③ RDK-X5 外设总线 PCB</h2>
+      <div class="board-wrap">
+        <svg class="pcb" viewBox="0 0 1100 520" xmlns="http://www.w3.org/2000/svg">
+          <rect width="1100" height="520" fill="var(--mask)"/>
+          <rect x="12" y="12" width="1076" height="496" rx="8" fill="#0b2a20" stroke="#1f6b4f" stroke-width="2"/>
+          <text x="28" y="40" fill="var(--silk)" font-size="16" font-family="ui-monospace,Consolas,monospace">RDK_X5 · HOST BUS</text>
+
+          <g class="chip-block" data-name="RDK-X5 8GB">
+            <rect class="ic-body" x="380" y="120" width="220" height="280" rx="6"/>
+            <text class="ic-silk" x="430" y="160">RDK-X5 8GB</text>
+            <text class="pad-label" x="400" y="200">Type-C 5V</text>
+            <text class="pad-label" x="400" y="230">USB3 Host</text>
+            <text class="pad-label" x="400" y="260">40PIN UART</text>
+            <text class="pad-label" x="400" y="290">3.5mm OUT</text>
+            <text class="pad-label" x="400" y="320">TF / FAN</text>
+            <text class="pad-label" x="400" y="350">ETH / WiFi</text>
+            <circle cx="380" cy="196" r="5" fill="var(--pad)"/><circle cx="380" cy="226" r="5" fill="var(--pad)"/>
+            <circle cx="380" cy="256" r="5" fill="var(--pad)"/><circle cx="380" cy="286" r="5" fill="var(--pad)"/>
+            <circle cx="600" cy="226" r="5" fill="var(--pad)"/><circle cx="600" cy="256" r="5" fill="var(--pad)"/>
+            <circle cx="600" cy="286" r="5" fill="var(--pad)"/>
+          </g>
+
+          <g class="chip-block" data-name="有源 USB3 Hub">
+            <rect class="ic-body" x="700" y="80" width="160" height="160" rx="4"/>
+            <text class="ic-silk" x="730" y="115">USB3 Hub</text>
+            <text class="ic-silk" x="725" y="135">有源 ≥2A</text>
+            <text class="pad-label" x="720" y="165">P1 Gemini</text>
+            <text class="pad-label" x="720" y="185">P2 Mic</text>
+            <text class="pad-label" x="720" y="205">P3 L610</text>
+            <text class="pad-label" x="720" y="225">DC 5V IN</text>
+          </g>
+
+          <g class="chip-block" data-name="Gemini 2"><rect class="ic-body" x="920" y="70" width="130" height="50" rx="3"/><text class="ic-silk" x="945" y="100">Gemini 2</text></g>
+          <g class="chip-block" data-name="ReSpeaker"><rect class="ic-body" x="920" y="135" width="130" height="50" rx="3"/><text class="ic-silk" x="940" y="165">ReSpeaker</text></g>
+          <g class="chip-block" data-name="L610"><rect class="ic-body" x="920" y="200" width="130" height="50" rx="3"/><text class="ic-silk" x="955" y="230">L610</text></g>
+
+          <g class="chip-block" data-name="ESP32 UART">
+            <rect class="ic-body" x="80" y="200" width="140" height="80" rx="4"/>
+            <text class="ic-silk" x="105" y="235">ESP32</text>
+            <text class="ic-silk" x="100" y="255">UART2</text>
+          </g>
+
+          <g class="chip-block" data-name="音频链路">
+            <rect class="ic-body" x="80" y="320" width="140" height="50" rx="3"/><text class="ic-silk" x="100" y="350">限幅网络</text>
+            <rect class="ic-body" x="80" y="390" width="140" height="50" rx="3"/><text class="ic-silk" x="105" y="420">PAM8403</text>
+            <rect class="ic-body" x="80" y="450" width="140" height="40" rx="3"/><text class="ic-silk" x="110" y="475">SPEAKER</text>
+          </g>
+
+          <path class="trace" data-net="USB_HOST" stroke="var(--usb)" stroke-width="3.5" d="M600 226 H700"/>
+          <path class="trace" data-net="USB_HOST" stroke="var(--usb)" stroke-width="2.5" d="M860 100 H920"/>
+          <path class="trace" data-net="USB_HOST" stroke="var(--usb)" stroke-width="2.5" d="M860 160 H920"/>
+          <path class="trace" data-net="USB_HOST" stroke="var(--usb)" stroke-width="2.5" d="M860 220 H920"/>
+          <path class="trace" data-net="UART_RDK" stroke="#7dd3fc" stroke-width="3" d="M380 256 H220 V240 H220"/>
+          <path class="trace" data-net="AUDIO" stroke="var(--sig)" stroke-width="3" d="M380 286 H250 V345 H220"/>
+          <path class="trace" data-net="AUDIO" stroke="var(--sig)" stroke-width="2.5" d="M150 370 V390"/>
+          <path class="trace" data-net="AUDIO" stroke="var(--sig)" stroke-width="2.5" d="M150 440 V450"/>
+          <path class="trace" data-net="5V" stroke="var(--v5)" stroke-width="3" d="M380 196 H300 V60 H780 V225"/>
+
+          <text x="28" y="500" fill="var(--muted)" font-size="12">大电流外设必须经有源 Hub；RDK 40PIN UART 为 3.3V，与 ESP32 直连交叉 TX/RX + 共 GND。</text>
+        </svg>
+      </div>
+      <div class="net-list" data-board="rdk">
+        <div class="net" data-net="USB_HOST"><strong>USB3</strong>RDK Host → Hub → Gemini / ReSpeaker / L610</div>
+        <div class="net" data-net="UART_RDK"><strong>UART</strong>RDK 40PIN ↔ ESP32 GPIO16/17（交叉）</div>
+        <div class="net" data-net="AUDIO"><strong>AUDIO</strong>3.5mm → 限幅 → PAM8403 → 喇叭</div>
+        <div class="net" data-net="5V"><strong>+5V</strong>主轨供 RDK Type-C 与 Hub 外电</div>
+      </div>
+    </section>
+
+    <footer>
+      非医疗竞赛样机接线示意 · 以 <code>docs/HARDWARE_WIRING_FLASH.md</code> 为准 ·
+      <a href="index.html" style="color:var(--accent)">执行计划首页</a>
+    </footer>
+  </div>
+
+  <script>
+    const tip = document.getElementById('tip');
+    const tabs = [...document.querySelectorAll('.nav .tab')];
+    const panels = {
+      pwr: document.getElementById('tab-pwr'),
+      esp: document.getElementById('tab-esp'),
+      rdk: document.getElementById('tab-rdk'),
+    };
+
+    tabs.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabs.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        Object.entries(panels).forEach(([k, el]) => {
+          el.hidden = k !== btn.dataset.tab;
+        });
+        clearHot();
+      });
+    });
+
+    function clearHot() {
+      document.querySelectorAll('.trace').forEach(t => {
+        t.classList.remove('hot', 'dim');
+      });
+      document.querySelectorAll('.net').forEach(n => n.classList.remove('on'));
+    }
+
+    function highlight(net) {
+      document.querySelectorAll('.trace').forEach(t => {
+        const match = t.dataset.net === net;
+        t.classList.toggle('hot', match);
+        t.classList.toggle('dim', !match);
+      });
+      document.querySelectorAll('.net').forEach(n => {
+        n.classList.toggle('on', n.dataset.net === net);
+      });
+    }
+
+    document.querySelectorAll('.net').forEach(n => {
+      n.addEventListener('click', () => highlight(n.dataset.net));
+    });
+    document.querySelectorAll('.trace').forEach(t => {
+      t.style.cursor = 'pointer';
+      t.addEventListener('click', () => highlight(t.dataset.net));
+      t.addEventListener('mousemove', (e) => {
+        tip.style.display = 'block';
+        tip.style.left = e.clientX + 12 + 'px';
+        tip.style.top = e.clientY + 12 + 'px';
+        tip.textContent = '网络: ' + t.dataset.net;
+      });
+      t.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+    });
+    document.querySelectorAll('.chip-block').forEach(g => {
+      g.addEventListener('mousemove', (e) => {
+        tip.style.display = 'block';
+        tip.style.left = e.clientX + 12 + 'px';
+        tip.style.top = e.clientY + 12 + 'px';
+        tip.textContent = g.dataset.name || '器件';
+      });
+      g.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+    });
+    document.getElementById('clearNet').addEventListener('click', clearHot);
+  </script>
+</body>
+</html>
