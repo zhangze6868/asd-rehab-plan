@@ -280,6 +280,7 @@
       <a href="#features">功能顺序</a>
       <a href="#bom">采购厂家型号</a>
       <a href="#wiring">连线步骤</a>
+      <a href="wiring_pcb.html">PCB引脚图</a>
       <a href="#app">应用设计</a>
       <a href="#lab">实验室验证</a>
       <a href="#share">仓库权限</a>
@@ -653,7 +654,11 @@
     </section>
 
     <section class="block" id="wiring">
-      <h2>五、器材连线步骤</h2>
+      <h2>五、器材连线与 PCB 引脚电路图</h2>
+      <div class="banner">
+        已按电源板 / ESP32 安全岛 / RDK 外设总线绘制 <strong>PCB 形式引脚互联图</strong>（可点击网表高亮走线）。
+        <a class="buy" href="wiring_pcb.html" style="margin-left:8px;">打开完整 PCB 连线页</a>
+      </div>
       <div class="wire">
         <span class="node">共地</span><span class="arrow">→</span>
         <span class="node">稳压分支</span><span class="arrow">→</span>
@@ -663,16 +668,38 @@
         <span class="node">雷达/音频</span><span class="arrow">→</span>
         <span class="node">烧录安全岛</span>
       </div>
+
+      <h3>关键引脚速查</h3>
+      <table>
+        <thead>
+          <tr><th>网络</th><th>从</th><th>到</th><th>说明</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>I²C SDA/SCL</td><td>ESP32 GPIO21/22</td><td>MPR121 · MPU6050</td><td>3.3V 总线并联</td></tr>
+          <tr><td>ESTOP</td><td>急停 NO</td><td>ESP32 GPIO4 → GND</td><td>按下为低</td></tr>
+          <tr><td>MUTE</td><td>ESP32 GPIO5</td><td>PAM8403 MUTE / 继电器 IN</td><td>高=安全静音</td></tr>
+          <tr><td>LED_DATA</td><td>GPIO18→330Ω→74AHCT125</td><td>WS2812B DIN</td><td>5V 逻辑驱动</td></tr>
+          <tr><td>UART↔RDK</td><td>GPIO16/17</td><td>RDK 40PIN UART</td><td>TX/RX 交叉 + 共地</td></tr>
+          <tr><td>UART↔雷达</td><td>GPIO25/26</td><td>R60A TX/RX</td><td>交叉；5V TTL 需电平转换</td></tr>
+          <tr><td>USB3</td><td>RDK Host</td><td>有源 Hub→Gemini/麦/L610</td><td>大电流勿硬扛板载口</td></tr>
+          <tr><td>AUDIO</td><td>RDK 3.5mm</td><td>限幅→PAM8403→喇叭</td><td>受控 5V 供电功放</td></tr>
+        </tbody>
+      </table>
+
+      <div style="margin:14px 0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#0b2a20;">
+        <iframe src="wiring_pcb.html" title="PCB 引脚连线图" style="width:100%;height:520px;border:0;display:block;"></iframe>
+      </div>
+
       <ol>
         <li>电池 BMS → 12V→5V 稳压；RDK / Hub / L610 分支供电，大电流就近回流。</li>
-        <li>急停 NC 切断灯带与功放 5V；NO 接入 ESP32 通知。</li>
+        <li>急停 NC 切断灯带与功放 5V；NO 接入 ESP32 GPIO4。</li>
         <li>ESP32：I²C（MPR121 + IMU）、WS2812 经 AHCT125、UART ↔ RDK。</li>
         <li>相机、阵列麦经有源 USB3 Hub 接入 RDK。</li>
         <li>R60A UART；RDK 3.5mm → 限幅 → PAM8403 → 扬声器。</li>
         <li>上电冒烟测试后烧录 <code>firmware/esp32/asd_safety_island.ino</code>。</li>
       </ol>
       <p><strong>禁止：</strong>舵机 / 云台；PCA9685 直接驱动 WS2812。</p>
-      <p class="muted">明细见仓库 <code>docs/HARDWARE_WIRING_FLASH.md</code>、<code>docs/HARDWARE_BOM.md</code>。</p>
+      <p class="muted">明细见 <code>docs/HARDWARE_WIRING_FLASH.md</code> · 交互图 <a href="wiring_pcb.html">wiring_pcb.html</a></p>
     </section>
 
     <section class="block" id="app">
