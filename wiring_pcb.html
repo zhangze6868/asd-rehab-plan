@@ -3,478 +3,698 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>ASD 康复机器人 · PCB 引脚连线图</title>
+  <title>ASD 康复机器人 · 嘉立创EDA 原理图 / 引脚图</title>
   <style>
     :root {
-      --mask: #0d3b2e;
-      --mask2: #12553f;
-      --copper: #d4a017;
-      --copper2: #f0c14a;
-      --silk: #e8f5ef;
-      --pad: #c0c0c0;
-      --hole: #1a1a1a;
-      --gnd: #5b8def;
-      --v5: #e85d4c;
-      --v33: #50c878;
-      --sig: #f0c14a;
-      --usb: #9b7ede;
-      --bg: #0a1f18;
-      --card: #12352a;
-      --muted: #9bb5a8;
-      --accent: #7dcea0;
-      --font: "IBM Plex Sans", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-      --display: "Source Han Serif SC", "Noto Serif SC", "Songti SC", serif;
+      --bg: #dfe4ea;
+      --sheet: #ffffff;
+      --grid: #e8e8e8;
+      --ink: #000000;
+      --wire: #000080;
+      --pwr: #cc0000;
+      --gnd: #000000;
+      --pin: #000000;
+      --name: #0000aa;
+      --des: #800000;
+      --val: #008000;
+      --hl: #ff6600;
+      --muted: #555;
+      --title: #1a1a1a;
+      --font: Arial, "Microsoft YaHei", "PingFang SC", sans-serif;
+      --mono: Consolas, "Courier New", monospace;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: var(--font);
-      color: var(--silk);
-      background:
-        radial-gradient(900px 500px at 10% -10%, #1a4d3a 0%, transparent 55%),
-        radial-gradient(700px 400px at 100% 0%, #2a3a20 0%, transparent 50%),
-        var(--bg);
-      line-height: 1.55;
+      background: var(--bg);
+      color: var(--title);
     }
-    .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 16px 72px; }
-    h1 {
-      font-family: var(--display);
-      font-size: clamp(1.6rem, 3.5vw, 2.2rem);
-      margin: 0 0 8px;
-    }
-    .sub { color: var(--muted); margin: 0 0 18px; max-width: 48rem; }
+    .wrap { max-width: 1240px; margin: 0 auto; padding: 16px 12px 48px; }
+    h1 { font-size: 1.35rem; margin: 0 0 6px; }
+    .sub { color: var(--muted); font-size: 0.9rem; margin: 0 0 12px; max-width: 52rem; }
     .nav {
-      display: flex; flex-wrap: wrap; gap: 8px;
-      margin-bottom: 18px; position: sticky; top: 0; z-index: 20;
-      padding: 10px 0; background: linear-gradient(180deg, rgba(10,31,24,.96), rgba(10,31,24,.85));
-      backdrop-filter: blur(8px);
+      display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px;
+      position: sticky; top: 0; z-index: 20; padding: 8px 0; background: var(--bg);
     }
     .nav a, .nav button {
-      appearance: none; border: 1px solid #2f5a48; background: #174536;
-      color: var(--silk); padding: 7px 12px; border-radius: 999px;
-      text-decoration: none; font: inherit; font-size: 0.88rem; cursor: pointer;
+      appearance: none; font: inherit; font-size: 0.86rem;
+      border: 1px solid #9aa3ad; background: #fff; color: #222;
+      padding: 6px 12px; border-radius: 2px; cursor: pointer; text-decoration: none;
     }
-    .nav a:hover, .nav button:hover, .nav button.active {
-      background: var(--accent); color: #0a1f18; border-color: var(--accent);
-    }
-    .legend {
-      display: flex; flex-wrap: wrap; gap: 10px 16px;
-      margin-bottom: 14px; font-size: 0.86rem; color: var(--muted);
-    }
-    .legend span { display: inline-flex; align-items: center; gap: 6px; }
-    .sw { width: 18px; height: 4px; border-radius: 2px; display: inline-block; }
-    .panel {
-      background: var(--card);
-      border: 1px solid #2a5745;
-      border-radius: 16px;
-      padding: 14px;
-      margin-bottom: 18px;
-      box-shadow: 0 12px 40px rgba(0,0,0,.25);
-    }
-    .panel h2 {
-      font-family: var(--display);
-      font-size: 1.2rem;
-      margin: 0 0 10px;
-      color: var(--accent);
-    }
-    .board-wrap {
+    .nav button.active { background: #1677ff; color: #fff; border-color: #1677ff; }
+    .legend { font-size: 0.8rem; color: var(--muted); margin-bottom: 8px; }
+    .sheet-frame {
+      background: var(--sheet);
+      border: 1px solid #8a8a8a;
+      box-shadow: 0 2px 10px rgba(0,0,0,.12);
       overflow: auto;
-      border-radius: 12px;
-      border: 1px solid #1e4637;
-      background: #08261c;
     }
-    svg.pcb { display: block; min-width: 980px; width: 100%; height: auto; }
-    .hint {
-      margin-top: 10px; font-size: 0.86rem; color: var(--muted);
+    svg.sch { display: block; min-width: 1100px; width: 100%; height: auto; }
+    table.pinmap {
+      width: 100%; border-collapse: collapse; font-size: 0.8rem; margin-top: 10px;
+      background: #fff; border: 1px solid #bbb;
     }
-    .net-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 8px;
-      margin-top: 12px;
+    table.pinmap th, table.pinmap td {
+      border: 1px solid #c8c8c8; padding: 5px 8px; text-align: left; font-family: var(--mono);
     }
-    .net {
-      border: 1px solid #2a5745;
-      border-radius: 10px;
-      padding: 8px 10px;
-      background: #0f2d23;
-      cursor: pointer;
-      font-size: 0.86rem;
-      transition: border-color .2s, transform .2s;
+    table.pinmap th { background: #f0f3f7; }
+    tr.hot td { background: #fff4e5; }
+    .hint { font-size: 0.82rem; color: var(--muted); margin-top: 8px; }
+    footer { margin-top: 18px; font-size: 0.8rem; color: var(--muted); text-align: center; }
+    .tip {
+      position: fixed; display: none; z-index: 50; pointer-events: none;
+      background: #fff; border: 1px solid #1677ff; padding: 6px 8px;
+      font-size: 0.78rem; font-family: var(--mono); max-width: 280px;
     }
-    .net:hover, .net.on {
-      border-color: var(--copper2);
-      transform: translateY(-1px);
-    }
-    .net strong { color: var(--copper2); display: block; margin-bottom: 2px; }
-    .pin-tip {
-      position: fixed; z-index: 50; pointer-events: none;
-      background: #102820; border: 1px solid var(--copper);
-      color: var(--silk); padding: 8px 10px; border-radius: 8px;
-      font-size: 0.82rem; max-width: 260px;
-      box-shadow: 0 8px 24px rgba(0,0,0,.35);
-      display: none;
-    }
-    .ic-body { fill: #1c1c1c; stroke: #888; stroke-width: 1; }
-    .ic-silk { fill: var(--silk); font-size: 11px; font-family: ui-monospace, Consolas, monospace; }
-    .pad-label { fill: var(--silk); font-size: 9px; font-family: ui-monospace, Consolas, monospace; }
-    .trace { fill: none; stroke-linecap: round; stroke-linejoin: round; opacity: 0.92; }
-    .trace.dim { opacity: 0.18; }
-    .trace.hot { opacity: 1; stroke-width: 3.5 !important; filter: drop-shadow(0 0 4px currentColor); }
-    .chip-block { cursor: pointer; }
-    .chip-block:hover .ic-body { stroke: var(--copper2); }
-    footer { margin-top: 24px; color: var(--muted); font-size: 0.84rem; text-align: center; }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>PCB 形式 · 器件引脚连线图</h1>
+    <h1>嘉立创EDA 标准原理图 / 器件引脚图</h1>
     <p class="sub">
-      按竞赛样机定型接线绘制：电源分配板、ESP32 安全岛、RDK 外设总线。
-      点击下方网表或图中走线可高亮同一网络。电平：RDK/ESP32 信号为 3.3V；灯带数据经 74AHCT125 升到 5V。
+      按立创 EDA（EasyEDA）出图习惯绘制：白底网格、位号+封装、引脚号在焊盘外侧、引脚名在符号内侧、网络标号互连。
+      点击导线或引脚表可高亮同一网络。电气以 <code>docs/HARDWARE_WIRING_FLASH.md</code> 与固件宏为准。
     </p>
-
     <nav class="nav">
-      <a href="index.html">← 返回执行计划</a>
-      <button type="button" class="tab active" data-tab="pwr">① 电源分配</button>
-      <button type="button" class="tab" data-tab="esp">② ESP32 安全岛</button>
-      <button type="button" class="tab" data-tab="rdk">③ RDK 外设总线</button>
+      <a href="index.html">← 执行计划</a>
+      <button type="button" class="tab active" data-tab="pwr">原理图1 电源</button>
+      <button type="button" class="tab" data-tab="esp">原理图2 安全岛</button>
+      <button type="button" class="tab" data-tab="rdk">原理图3 主控外设</button>
+      <button type="button" class="tab" data-tab="fp">封装引脚图</button>
       <button type="button" id="clearNet">清除高亮</button>
     </nav>
+    <p class="legend">线色：深蓝=信号 · 红=+5V/+12V · 绿=+3V3 · 黑=GND　位号规则：U 芯片 / R 电阻 / C 电容 / F 保险 / K 继电器 / SW 开关 / J 接插件 / BAT 电池</p>
+    <div class="tip" id="tip"></div>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <defs>
+        <pattern id="g" width="10" height="10" patternUnits="userSpaceOnUse">
+          <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#ececec" stroke-width="1"/>
+        </pattern>
+      </defs>
+    </svg>
 
-    <div class="legend">
-      <span><i class="sw" style="background:var(--v5)"></i> +5V</span>
-      <span><i class="sw" style="background:var(--v33)"></i> +3V3</span>
-      <span><i class="sw" style="background:var(--gnd)"></i> GND</span>
-      <span><i class="sw" style="background:var(--sig)"></i> 信号</span>
-      <span><i class="sw" style="background:var(--usb)"></i> USB</span>
-      <span><i class="sw" style="background:#ff8c42"></i> 受控 5V（急停/继电器后）</span>
-    </div>
+    <!-- ===== SHEET 1 POWER ===== -->
+    <section class="tab-panel" id="tab-pwr">
+      <div class="sheet-frame">
+        <svg class="sch" viewBox="0 0 1200 680" xmlns="http://www.w3.org/2000/svg">
+          <rect width="1200" height="680" fill="#fff"/>
+          <rect x="20" y="20" width="1160" height="640" fill="url(#g)" stroke="#000" stroke-width="1.6"/>
+          <rect x="24" y="24" width="1152" height="632" fill="none" stroke="#000" stroke-width="0.6"/>
+          <text x="36" y="48" font-size="16" font-family="Arial" font-weight="700">原理图1  电源分配 POWER</text>
+          <text x="36" y="66" font-size="11" fill="#555" font-family="Arial">先电源后信号 · 共地 · 受控5V仅供灯带与功放</text>
 
-    <div class="pin-tip" id="tip"></div>
-
-    <!-- ================= POWER ================= -->
-    <section class="panel tab-panel" id="tab-pwr">
-      <h2>① 电源分配 PCB（先电源后信号）</h2>
-      <div class="board-wrap">
-        <svg class="pcb" viewBox="0 0 1100 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="电源分配 PCB">
-          <defs>
-            <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#0f3328" stroke-width="1"/>
-            </pattern>
-          </defs>
-          <rect width="1100" height="520" fill="var(--mask)"/>
-          <rect x="12" y="12" width="1076" height="496" rx="8" fill="url(#grid)" stroke="#1f6b4f" stroke-width="2"/>
-          <text x="28" y="40" fill="var(--silk)" font-size="16" font-family="ui-monospace,Consolas,monospace">PWR_DIST · ASD-REHAB · TOP</text>
-          <text x="820" y="40" fill="var(--muted)" font-size="11">共地必须 · 粗线供电</text>
-
-          <!-- Battery -->
-          <g class="chip-block" data-name="12V 电池+BMS">
-            <rect class="ic-body" x="40" y="80" width="120" height="70" rx="4"/>
-            <text class="ic-silk" x="55" y="110">BAT 12V</text>
-            <text class="ic-silk" x="55" y="128">+ BMS</text>
-            <circle cx="160" cy="100" r="5" fill="var(--pad)" stroke="#666"/><circle cx="160" cy="100" r="2" fill="var(--hole)"/>
-            <circle cx="160" cy="130" r="5" fill="var(--pad)" stroke="#666"/><circle cx="160" cy="130" r="2" fill="var(--hole)"/>
-            <text class="pad-label" x="168" y="104">+</text>
-            <text class="pad-label" x="168" y="134">−</text>
+          <!-- BAT1 -->
+          <g>
+            <line x1="80" y1="140" x2="80" y2="170" stroke="#000" stroke-width="1.4"/>
+            <line x1="68" y1="170" x2="92" y2="170" stroke="#000" stroke-width="3"/>
+            <line x1="74" y1="190" x2="86" y2="190" stroke="#000" stroke-width="1.4"/>
+            <line x1="68" y1="210" x2="92" y2="210" stroke="#000" stroke-width="3"/>
+            <line x1="80" y1="210" x2="80" y2="240" stroke="#000" stroke-width="1.4"/>
+            <text x="52" y="128" fill="#800000" font-size="12" font-family="Arial">BAT1</text>
+            <text x="48" y="258" fill="#008000" font-size="11" font-family="Arial">12V 3S+BMS</text>
+            <text x="92" y="148" font-size="10">1 +</text>
+            <text x="92" y="236" font-size="10">2 −</text>
           </g>
+          <path class="trace" data-net="VIN_12V" fill="none" stroke="#cc0000" stroke-width="1.8" d="M80 140 V110 H160"/>
+          <path class="trace" data-net="GND" fill="none" stroke="#000" stroke-width="1.8" d="M80 240 V400 H1100"/>
 
-          <!-- Switch fuse -->
-          <g class="chip-block" data-name="总开关+7.5A">
-            <rect class="ic-body" x="220" y="85" width="100" height="60" rx="4"/>
-            <text class="ic-silk" x="232" y="112">SW+F7.5A</text>
-            <text class="ic-silk" x="240" y="130">主断</text>
+          <!-- SW1 -->
+          <g>
+            <circle cx="180" cy="110" r="3.5" fill="none" stroke="#000"/>
+            <circle cx="220" cy="110" r="3.5" fill="none" stroke="#000"/>
+            <line x1="183" y1="108" x2="216" y2="96" stroke="#000" stroke-width="1.5"/>
+            <text x="176" y="90" fill="#800000" font-size="12">SW1</text>
+            <text x="168" y="136" fill="#008000" font-size="10">船型 10A</text>
           </g>
+          <path class="trace" data-net="VIN_12V" fill="none" stroke="#cc0000" stroke-width="1.8" d="M223 110 H270"/>
 
-          <!-- Buck -->
-          <g class="chip-block" data-name="12V→5V ≥8A">
-            <rect class="ic-body" x="380" y="70" width="150" height="90" rx="4"/>
-            <text class="ic-silk" x="400" y="100">BUCK 12→5V</text>
-            <text class="ic-silk" x="410" y="118">≥8A SYNC</text>
-            <text class="pad-label" x="390" y="148">IN+</text>
-            <text class="pad-label" x="390" y="162">IN−</text>
-            <text class="pad-label" x="490" y="148">OUT+</text>
-            <text class="pad-label" x="490" y="162">OUT−</text>
-            <circle cx="380" cy="145" r="5" fill="var(--pad)"/><circle cx="380" cy="145" r="2" fill="var(--hole)"/>
-            <circle cx="380" cy="160" r="5" fill="var(--pad)"/><circle cx="380" cy="160" r="2" fill="var(--hole)"/>
-            <circle cx="530" cy="145" r="5" fill="var(--pad)"/><circle cx="530" cy="145" r="2" fill="var(--hole)"/>
-            <circle cx="530" cy="160" r="5" fill="var(--pad)"/><circle cx="530" cy="160" r="2" fill="var(--hole)"/>
+          <!-- F1 -->
+          <g>
+            <rect x="270" y="100" width="70" height="20" fill="#fff" stroke="#000"/>
+            <text x="288" y="114" font-size="11" font-family="Consolas">F7.5A</text>
+            <text x="286" y="90" fill="#800000" font-size="12">F1</text>
+            <text x="268" y="136" fill="#008000" font-size="10">5×20mm</text>
           </g>
+          <path class="trace" data-net="VIN_12V" fill="none" stroke="#cc0000" stroke-width="1.8" d="M340 110 H400"/>
 
-          <!-- 5V fuse -->
-          <g class="chip-block" data-name="5V 主路 8A 保险">
-            <rect class="ic-body" x="580" y="120" width="70" height="40" rx="3"/>
-            <text class="ic-silk" x="590" y="145">F8A</text>
+          <!-- U5 BUCK -->
+          <g>
+            <rect x="400" y="80" width="150" height="90" fill="#fff" stroke="#000" stroke-width="1.4"/>
+            <text x="430" y="70" fill="#800000" font-size="12">U5</text>
+            <text x="418" y="186" fill="#008000" font-size="11">MODULE-BUCK 12V-5V≥8A</text>
+            <text x="408" y="108" font-size="10">1 IN+</text>
+            <text x="408" y="128" font-size="10">2 IN−</text>
+            <text x="478" y="108" font-size="10">OUT+ 3</text>
+            <text x="478" y="128" font-size="10">OUT− 4</text>
+            <line x1="400" y1="104" x2="388" y2="104" stroke="#000"/><circle cx="388" cy="104" r="2.2" fill="#000"/>
+            <line x1="400" y1="124" x2="388" y2="124" stroke="#000"/><circle cx="388" cy="124" r="2.2" fill="#000"/>
+            <line x1="550" y1="104" x2="562" y2="104" stroke="#000"/><circle cx="562" cy="104" r="2.2" fill="#000"/>
+            <line x1="550" y1="124" x2="562" y2="124" stroke="#000"/><circle cx="562" cy="124" r="2.2" fill="#000"/>
+            <text x="445" y="158" font-size="12" font-weight="700">U5</text>
           </g>
+          <path class="trace" data-net="VIN_12V" fill="none" stroke="#cc0000" stroke-width="1.8" d="M388 104 H388 V110 H400"/>
+          <path class="trace" data-net="GND" fill="none" stroke="#000" stroke-width="1.8" d="M388 124 V400"/>
+          <path class="trace" data-net="GND" fill="none" stroke="#000" stroke-width="1.8" d="M562 124 V400"/>
+          <path class="trace" data-net="P5V" fill="none" stroke="#cc0000" stroke-width="1.8" d="M562 104 H610"/>
 
-          <!-- Loads -->
-          <g class="chip-block" data-name="RDK-X5"><rect class="ic-body" x="720" y="60" width="110" height="50" rx="3"/><text class="ic-silk" x="740" y="90">RDK-X5</text></g>
-          <g class="chip-block" data-name="USB Hub"><rect class="ic-body" x="720" y="125" width="110" height="40" rx="3"/><text class="ic-silk" x="742" y="150">USB Hub</text></g>
-          <g class="chip-block" data-name="ESP32 5V"><rect class="ic-body" x="720" y="180" width="110" height="40" rx="3"/><text class="ic-silk" x="742" y="205">ESP32 5V</text></g>
-          <g class="chip-block" data-name="L610 5V"><rect class="ic-body" x="720" y="235" width="110" height="40" rx="3"/><text class="ic-silk" x="745" y="260">L610 5V</text></g>
-
-          <!-- Relay controlled rail -->
-          <g class="chip-block" data-name="继电器+急停受控轨">
-            <rect class="ic-body" x="880" y="120" width="170" height="120" rx="4"/>
-            <text class="ic-silk" x="900" y="150">RELAY 5V</text>
-            <text class="ic-silk" x="900" y="168">COM←5V</text>
-            <text class="ic-silk" x="900" y="186">NO→F3A</text>
-            <text class="ic-silk" x="900" y="210">ESTOP NC</text>
-            <text class="ic-silk" x="900" y="226">串受控母线</text>
+          <!-- F2 -->
+          <g>
+            <rect x="610" y="94" width="60" height="20" fill="#fff" stroke="#000"/>
+            <text x="624" y="108" font-size="11" font-family="Consolas">F8A</text>
+            <text x="626" y="86" fill="#800000" font-size="12">F2</text>
           </g>
-          <g class="chip-block" data-name="WS2812B 5V"><rect class="ic-body" x="900" y="280" width="130" height="40" rx="3"/><text class="ic-silk" x="918" y="305">WS2812 5V</text></g>
-          <g class="chip-block" data-name="PAM8403 VCC"><rect class="ic-body" x="900" y="335" width="130" height="40" rx="3"/><text class="ic-silk" x="915" y="360">PAM8403 VCC</text></g>
+          <path class="trace" data-net="P5V" fill="none" stroke="#cc0000" stroke-width="1.8" d="M670 104 H720 V104"/>
+          <circle cx="720" cy="104" r="2.5" fill="#cc0000"/>
 
-          <!-- Traces -->
-          <path class="trace" data-net="BAT+" stroke="var(--v5)" stroke-width="4" d="M160 100 H220"/>
-          <path class="trace" data-net="BAT+" stroke="var(--v5)" stroke-width="4" d="M320 115 H380"/>
-          <path class="trace" data-net="GND" stroke="var(--gnd)" stroke-width="4" d="M160 130 H250 V200 H380 V160"/>
-          <path class="trace" data-net="GND" stroke="var(--gnd)" stroke-width="3" d="M380 160 H700 V400 H60 V130"/>
-          <path class="trace" data-net="5V" stroke="var(--v5)" stroke-width="4" d="M530 145 H580"/>
-          <path class="trace" data-net="5V" stroke="var(--v5)" stroke-width="3.5" d="M650 140 H720 V85"/>
-          <path class="trace" data-net="5V" stroke="var(--v5)" stroke-width="3" d="M680 140 V145 H720"/>
-          <path class="trace" data-net="5V" stroke="var(--v5)" stroke-width="3" d="M680 140 V200 H720"/>
-          <path class="trace" data-net="5V" stroke="var(--v5)" stroke-width="3" d="M680 140 V255 H720"/>
-          <path class="trace" data-net="5V" stroke="var(--v5)" stroke-width="3" d="M680 140 V180 H880"/>
-          <path class="trace" data-net="CTRL5V" stroke="#ff8c42" stroke-width="3.5" d="M965 240 V280 H965"/>
-          <path class="trace" data-net="CTRL5V" stroke="#ff8c42" stroke-width="3" d="M965 240 V355 H965"/>
+          <!-- 5V loads as netports -->
+          <g font-family="Arial" font-size="11">
+            <rect x="740" y="70" width="130" height="22" fill="#fff" stroke="#0000aa"/>
+            <text x="748" y="85" fill="#0000aa">P5V → J_RDK.1 5V</text>
+            <rect x="740" y="100" width="130" height="22" fill="#fff" stroke="#0000aa"/>
+            <text x="748" y="115" fill="#0000aa">P5V → J_HUB.1 VIN</text>
+            <rect x="740" y="130" width="150" height="22" fill="#fff" stroke="#0000aa"/>
+            <text x="748" y="145" fill="#0000aa">P5V → U1.19 5V</text>
+            <rect x="740" y="160" width="150" height="22" fill="#fff" stroke="#0000aa"/>
+            <text x="748" y="175" fill="#0000aa">P5V → J_L610.1 5V</text>
+            <rect x="740" y="190" width="150" height="22" fill="#fff" stroke="#0000aa"/>
+            <text x="748" y="205" fill="#0000aa">P5V → K1.3 COM</text>
+          </g>
+          <path class="trace" data-net="P5V" fill="none" stroke="#cc0000" stroke-width="1.6" d="M720 104 V81 H740"/>
+          <path class="trace" data-net="P5V" fill="none" stroke="#cc0000" stroke-width="1.6" d="M720 104 V111 H740"/>
+          <path class="trace" data-net="P5V" fill="none" stroke="#cc0000" stroke-width="1.6" d="M720 104 V141 H740"/>
+          <path class="trace" data-net="P5V" fill="none" stroke="#cc0000" stroke-width="1.6" d="M720 104 V171 H740"/>
+          <path class="trace" data-net="P5V" fill="none" stroke="#cc0000" stroke-width="1.6" d="M720 104 V201 H740"/>
 
-          <text x="40" y="470" fill="var(--muted)" font-size="12">注：急停按下 → 受控 5V（灯/功放）断电；RDK/Hub/ESP32/L610 主轨策略按整机安全设计保留或同步切断。</text>
+          <!-- K1 relay -->
+          <g>
+            <rect x="200" y="280" width="160" height="110" fill="#fff" stroke="#000" stroke-width="1.4"/>
+            <text x="255" y="270" fill="#800000" font-size="12">K1</text>
+            <text x="210" y="408" fill="#008000" font-size="11">RELAY-5V 光耦高电平</text>
+            <text x="208" y="304" font-size="10">1 IN ← GPIO5</text>
+            <text x="208" y="324" font-size="10">2 GND</text>
+            <text x="208" y="348" font-size="10">3 COM</text>
+            <text x="208" y="368" font-size="10">4 NO</text>
+            <line x1="200" y1="300" x2="188" y2="300" stroke="#000"/>
+            <line x1="200" y1="320" x2="188" y2="320" stroke="#000"/>
+            <line x1="200" y1="344" x2="188" y2="344" stroke="#000"/>
+            <line x1="360" y1="364" x2="372" y2="364" stroke="#000"/>
+            <text x="255" y="355" font-size="12" font-weight="700">K1</text>
+          </g>
+          <path class="trace" data-net="MUTE" fill="none" stroke="#000080" stroke-width="1.4" d="M188 300 H140 V260"/>
+          <text x="90" y="256" fill="#0000aa" font-size="11" font-family="Arial">NET MUTE</text>
+          <path class="trace" data-net="GND" fill="none" stroke="#000" stroke-width="1.6" d="M188 320 V400"/>
+          <path class="trace" data-net="P5V" fill="none" stroke="#cc0000" stroke-width="1.6" d="M188 344 H160 V201 H720"/>
+          <path class="trace" data-net="CTRL5V" fill="none" stroke="#cc0000" stroke-width="1.8" stroke-dasharray="6 3" d="M372 364 H430"/>
+
+          <!-- SW2 ESTOP NC in series with CTRL5V -->
+          <g>
+            <circle cx="450" cy="364" r="3.5" fill="none" stroke="#000"/>
+            <circle cx="490" cy="364" r="3.5" fill="none" stroke="#000"/>
+            <line x1="453" y1="364" x2="486" y2="348" stroke="#000" stroke-width="1.5"/>
+            <text x="448" y="338" fill="#800000" font-size="12">SW2-NC</text>
+            <text x="430" y="396" fill="#008000" font-size="10">急停常闭 22mm</text>
+          </g>
+          <path class="trace" data-net="CTRL5V" fill="none" stroke="#cc0000" stroke-width="1.8" stroke-dasharray="6 3" d="M493 364 H540"/>
+
+          <!-- F3 -->
+          <g>
+            <rect x="540" y="354" width="60" height="20" fill="#fff" stroke="#000"/>
+            <text x="554" y="368" font-size="11" font-family="Consolas">F3A</text>
+            <text x="556" y="346" fill="#800000" font-size="12">F3</text>
+          </g>
+          <path class="trace" data-net="CTRL5V" fill="none" stroke="#cc0000" stroke-width="1.8" stroke-dasharray="6 3" d="M600 364 H650"/>
+          <circle cx="650" cy="364" r="2.5" fill="#cc0000"/>
+          <rect x="670" y="330" width="170" height="22" fill="#fff" stroke="#0000aa"/>
+          <text x="678" y="345" fill="#0000aa" font-size="11">CTRL5V → D1.VDD WS2812B</text>
+          <rect x="670" y="360" width="170" height="22" fill="#fff" stroke="#0000aa"/>
+          <text x="678" y="375" fill="#0000aa" font-size="11">CTRL5V → U6.VCC PAM8403</text>
+          <path class="trace" data-net="CTRL5V" fill="none" stroke="#cc0000" stroke-width="1.5" stroke-dasharray="6 3" d="M650 364 V341 H670"/>
+          <path class="trace" data-net="CTRL5V" fill="none" stroke="#cc0000" stroke-width="1.5" stroke-dasharray="6 3" d="M650 364 V371 H670"/>
+
+          <!-- SW2 NO to GPIO4 -->
+          <g>
+            <circle cx="450" cy="460" r="3.5" fill="none" stroke="#000"/>
+            <circle cx="490" cy="460" r="3.5" fill="none" stroke="#000"/>
+            <line x1="453" y1="460" x2="478" y2="444" stroke="#000" stroke-width="1.5"/>
+            <text x="448" y="434" fill="#800000" font-size="12">SW2-NO</text>
+            <text x="430" y="492" fill="#008000" font-size="10">急停常开 → GPIO4</text>
+          </g>
+          <path class="trace" data-net="ESTOP" fill="none" stroke="#000080" stroke-width="1.4" d="M493 460 H560"/>
+          <rect x="560" y="449" width="150" height="22" fill="#fff" stroke="#0000aa"/>
+          <text x="568" y="464" fill="#0000aa" font-size="11">ESTOP → U1.13 GPIO4</text>
+          <path class="trace" data-net="GND" fill="none" stroke="#000" stroke-width="1.5" d="M450 460 V400"/>
+
+          <!-- title block -->
+          <g font-family="Arial" font-size="11">
+            <rect x="820" y="500" width="348" height="140" fill="#fff" stroke="#000" stroke-width="1.2"/>
+            <line x1="820" y1="528" x2="1168" y2="528" stroke="#000"/>
+            <line x1="820" y1="556" x2="1168" y2="556" stroke="#000"/>
+            <line x1="820" y1="584" x2="1168" y2="584" stroke="#000"/>
+            <line x1="820" y1="612" x2="1168" y2="612" stroke="#000"/>
+            <line x1="940" y1="500" x2="940" y2="640" stroke="#000"/>
+            <text x="828" y="518">设计工具</text><text x="952" y="518">嘉立创EDA / EasyEDA</text>
+            <text x="828" y="546">图名</text><text x="952" y="546">ASD康复机器人 电源原理图</text>
+            <text x="828" y="574">图号</text><text x="952" y="574">SCH-ASD-PWR-001</text>
+            <text x="828" y="602">版本 / 页次</text><text x="952" y="602">A.0　　1 / 3</text>
+            <text x="828" y="630">日期</text><text x="952" y="630">2026-09-15　　非医疗样机</text>
+          </g>
         </svg>
       </div>
-      <div class="net-list" data-board="pwr">
-        <div class="net" data-net="BAT+"><strong>BAT+</strong>电池+ → 总开关 → BUCK IN+</div>
-        <div class="net" data-net="5V"><strong>+5V 主轨</strong>BUCK OUT → F8A → RDK / Hub / ESP32 / L610 / RELAY COM</div>
-        <div class="net" data-net="CTRL5V"><strong>受控 5V</strong>RELAY NO → F3A → WS2812 / PAM8403</div>
-        <div class="net" data-net="GND"><strong>GND 汇流</strong>电池−、BUCK、各模块共地</div>
-      </div>
-      <p class="hint">施工顺序：共地 → 稳压 → 分支保险 → 急停/继电器受控负载 → 再接信号线。</p>
+      <table class="pinmap">
+        <thead><tr><th>位号</th><th>封装/规格</th><th>引脚</th><th>引脚名</th><th>网络</th></tr></thead>
+        <tbody>
+          <tr data-net="VIN_12V"><td>BAT1</td><td>BAT-12V-BMS</td><td>1</td><td>+</td><td>VIN_12V</td></tr>
+          <tr data-net="GND"><td>BAT1</td><td>BAT-12V-BMS</td><td>2</td><td>−</td><td>GND</td></tr>
+          <tr data-net="VIN_12V"><td>SW1</td><td>SW-ROCKER-10A</td><td>1-2</td><td>—</td><td>VIN_12V</td></tr>
+          <tr data-net="VIN_12V"><td>F1</td><td>FUSE-5x20</td><td>1-2</td><td>7.5A</td><td>VIN_12V</td></tr>
+          <tr data-net="P5V"><td>U5</td><td>MODULE-BUCK</td><td>3</td><td>OUT+</td><td>P5V</td></tr>
+          <tr data-net="P5V"><td>F2</td><td>FUSE-5x20</td><td>1-2</td><td>8A</td><td>P5V</td></tr>
+          <tr data-net="CTRL5V"><td>K1</td><td>RELAY-5V</td><td>4</td><td>NO</td><td>CTRL5V</td></tr>
+          <tr data-net="CTRL5V"><td>SW2</td><td>ESTOP-22MM</td><td>NC</td><td>常闭</td><td>CTRL5V 串入</td></tr>
+          <tr data-net="ESTOP"><td>SW2</td><td>ESTOP-22MM</td><td>NO</td><td>常开</td><td>ESTOP</td></tr>
+          <tr data-net="CTRL5V"><td>F3</td><td>FUSE-5x20</td><td>1-2</td><td>3A</td><td>CTRL5V</td></tr>
+        </tbody>
+      </table>
     </section>
 
-    <!-- ================= ESP32 ================= -->
-    <section class="panel tab-panel" id="tab-esp" hidden>
-      <h2>② ESP32 安全岛 PCB（引脚一一对应）</h2>
-      <div class="board-wrap">
-        <svg class="pcb" viewBox="0 0 1180 640" xmlns="http://www.w3.org/2000/svg">
-          <rect width="1180" height="640" fill="var(--mask)"/>
-          <rect x="12" y="12" width="1156" height="616" rx="8" fill="#0b2a20" stroke="#1f6b4f" stroke-width="2"/>
-          <text x="28" y="40" fill="var(--silk)" font-size="16" font-family="ui-monospace,Consolas,monospace">SAFE_ISLAND · ESP32-WROOM-32 DevKitC</text>
+    <!-- ===== SHEET 2 ESP32 ===== -->
+    <section class="tab-panel" id="tab-esp" hidden>
+      <div class="sheet-frame">
+        <svg class="sch" viewBox="0 0 1240 820" xmlns="http://www.w3.org/2000/svg">
+          <rect width="1240" height="820" fill="#fff"/>
+          <rect x="16" y="16" width="1208" height="788" fill="url(#g)" stroke="#000" stroke-width="1.6"/>
+          <text x="32" y="44" font-size="16" font-weight="700" font-family="Arial">原理图2  安全岛 MCU</text>
+          <text x="32" y="62" font-size="11" fill="#555">U1 ESP32-WROOM-32 DevKitC　引脚号=开发板丝印排针序号（USB口在上方）</text>
 
-          <!-- ESP32 footprint style -->
-          <g class="chip-block" data-name="ESP32 DevKitC">
-            <rect class="ic-body" x="430" y="160" width="200" height="320" rx="6"/>
-            <text class="ic-silk" x="470" y="200">ESP32</text>
-            <text class="ic-silk" x="455" y="220">DevKitC</text>
+          <!-- U1 ESP32 DIP dual header -->
+          <g>
+            <rect x="470" y="90" width="220" height="520" fill="#fff" stroke="#000" stroke-width="1.6"/>
+            <text x="548" y="80" fill="#800000" font-size="13">U1</text>
+            <text x="500" y="628" fill="#008000" font-size="11">ESP32-WROOM-32 DevKitC</text>
+            <text x="530" y="350" font-size="13" font-weight="700">U1</text>
+            <text x="512" y="370" font-size="10">ESP32-WROOM-32</text>
             <!-- left pins -->
-            <g font-family="ui-monospace,Consolas,monospace" font-size="10" fill="var(--silk)">
-              <circle cx="430" cy="250" r="5" fill="var(--pad)"/><circle cx="430" cy="250" r="2" fill="var(--hole)"/><text x="400" y="254">3V3</text>
-              <circle cx="430" cy="280" r="5" fill="var(--pad)"/><circle cx="430" cy="280" r="2" fill="var(--hole)"/><text x="398" y="284">GND</text>
-              <circle cx="430" cy="310" r="5" fill="var(--pad)"/><circle cx="430" cy="310" r="2" fill="var(--hole)"/><text x="378" y="314">GPIO21</text>
-              <circle cx="430" cy="340" r="5" fill="var(--pad)"/><circle cx="430" cy="340" r="2" fill="var(--hole)"/><text x="378" y="344">GPIO22</text>
-              <circle cx="430" cy="370" r="5" fill="var(--pad)"/><circle cx="430" cy="370" r="2" fill="var(--hole)"/><text x="385" y="374">GPIO4</text>
-              <circle cx="430" cy="400" r="5" fill="var(--pad)"/><circle cx="430" cy="400" r="2" fill="var(--hole)"/><text x="385" y="404">GPIO5</text>
+            <g font-size="10" font-family="Consolas">
+              <line x1="470" y1="120" x2="448" y2="120" stroke="#000"/><text x="476" y="124">3V3</text><text x="428" y="124" fill="#555">1</text>
+              <line x1="470" y1="200" x2="448" y2="200" stroke="#000"/><text x="476" y="204">IO25</text><text x="422" y="204" fill="#555">9</text>
+              <line x1="470" y1="230" x2="448" y2="230" stroke="#000"/><text x="476" y="234">IO26</text><text x="416" y="234" fill="#555">10</text>
+              <line x1="470" y1="320" x2="448" y2="320" stroke="#000"/><text x="476" y="324">GND</text><text x="416" y="324" fill="#555">14</text>
+              <line x1="470" y1="560" x2="448" y2="560" stroke="#000"/><text x="476" y="564">5V</text><text x="416" y="564" fill="#555">19</text>
             </g>
             <!-- right pins -->
-            <g font-family="ui-monospace,Consolas,monospace" font-size="10" fill="var(--silk)">
-              <circle cx="630" cy="250" r="5" fill="var(--pad)"/><circle cx="630" cy="250" r="2" fill="var(--hole)"/><text x="640" y="254">GPIO18</text>
-              <circle cx="630" cy="290" r="5" fill="var(--pad)"/><circle cx="630" cy="290" r="2" fill="var(--hole)"/><text x="640" y="294">GPIO16</text>
-              <circle cx="630" cy="330" r="5" fill="var(--pad)"/><circle cx="630" cy="330" r="2" fill="var(--hole)"/><text x="640" y="334">GPIO17</text>
-              <circle cx="630" cy="380" r="5" fill="var(--pad)"/><circle cx="630" cy="380" r="2" fill="var(--hole)"/><text x="640" y="384">GPIO25</text>
-              <circle cx="630" cy="420" r="5" fill="var(--pad)"/><circle cx="630" cy="420" r="2" fill="var(--hole)"/><text x="640" y="424">GPIO26</text>
-              <circle cx="630" cy="460" r="5" fill="var(--pad)"/><circle cx="630" cy="460" r="2" fill="var(--hole)"/><text x="640" y="464">5V</text>
+            <g font-size="10" font-family="Consolas">
+              <line x1="690" y1="150" x2="712" y2="150" stroke="#000"/><text x="628" y="154">IO22</text><text x="716" y="154" fill="#555">3</text>
+              <line x1="690" y1="190" x2="712" y2="190" stroke="#000"/><text x="628" y="194">IO21</text><text x="716" y="194" fill="#555">6</text>
+              <line x1="690" y1="240" x2="712" y2="240" stroke="#000"/><text x="628" y="244">GND</text><text x="716" y="244" fill="#555">7</text>
+              <line x1="690" y1="290" x2="712" y2="290" stroke="#000"/><text x="628" y="294">IO18</text><text x="716" y="294" fill="#555">9</text>
+              <line x1="690" y1="330" x2="712" y2="330" stroke="#000"/><text x="628" y="334">IO5</text><text x="716" y="334" fill="#555">10</text>
+              <line x1="690" y1="370" x2="712" y2="370" stroke="#000"/><text x="628" y="374">IO17</text><text x="716" y="374" fill="#555">11</text>
+              <line x1="690" y1="410" x2="712" y2="410" stroke="#000"/><text x="628" y="414">IO16</text><text x="716" y="414" fill="#555">12</text>
+              <line x1="690" y1="450" x2="712" y2="450" stroke="#000"/><text x="628" y="454">IO4</text><text x="716" y="454" fill="#555">13</text>
+            </g>
+          </g>
+
+          <!-- U2 MPR121 SOP-style -->
+          <g>
+            <rect x="80" y="100" width="170" height="150" fill="#fff" stroke="#000" stroke-width="1.4"/>
+            <text x="145" y="90" fill="#800000" font-size="12">U2</text>
+            <text x="100" y="268" fill="#008000" font-size="10">SOP20 / MPR121 模块</text>
+            <text x="140" y="175" font-size="12" font-weight="700">U2</text>
+            <g font-size="10" font-family="Consolas">
+              <line x1="250" y1="130" x2="268" y2="130" stroke="#000"/><text x="88" y="134">VIN  1</text>
+              <line x1="250" y1="155" x2="268" y2="155" stroke="#000"/><text x="88" y="159">GND  2</text>
+              <line x1="250" y1="180" x2="268" y2="180" stroke="#000"/><text x="88" y="184">SDA  3</text>
+              <line x1="250" y1="205" x2="268" y2="205" stroke="#000"/><text x="88" y="209">SCL  4</text>
+              <text x="88" y="230" font-size="9">ELE0-3 触摸电极</text>
+            </g>
+          </g>
+
+          <!-- U3 MPU6050 -->
+          <g>
+            <rect x="80" y="310" width="170" height="170" fill="#fff" stroke="#000" stroke-width="1.4"/>
+            <text x="145" y="300" fill="#800000" font-size="12">U3</text>
+            <text x="95" y="498" fill="#008000" font-size="10">GY-521  1.0×0.6inch</text>
+            <text x="135" y="390" font-size="12" font-weight="700">U3</text>
+            <g font-size="10" font-family="Consolas">
+              <line x1="250" y1="340" x2="268" y2="340" stroke="#000"/><text x="88" y="344">VCC  1</text>
+              <line x1="250" y1="365" x2="268" y2="365" stroke="#000"/><text x="88" y="369">GND  2</text>
+              <line x1="250" y1="390" x2="268" y2="390" stroke="#000"/><text x="88" y="394">SCL  3</text>
+              <line x1="250" y1="415" x2="268" y2="415" stroke="#000"/><text x="88" y="419">SDA  4</text>
+              <line x1="250" y1="440" x2="268" y2="440" stroke="#000"/><text x="88" y="444">AD0  7</text>
+            </g>
+          </g>
+
+          <!-- R1 330 -->
+          <g>
+            <rect x="760" y="276" width="50" height="18" fill="#fff" stroke="#000"/>
+            <line x1="712" y1="285" x2="760" y2="285" stroke="#000080"/>
+            <line x1="810" y1="285" x2="850" y2="285" stroke="#000080"/>
+            <text x="772" y="268" fill="#800000" font-size="12">R1</text>
+            <text x="766" y="310" fill="#008000" font-size="10">330Ω 0603</text>
+          </g>
+
+          <!-- U4 74AHCT125 DIP-14 official pinout -->
+          <g>
+            <rect x="850" y="90" width="150" height="280" fill="#fff" stroke="#000" stroke-width="1.4"/>
+            <text x="900" y="80" fill="#800000" font-size="12">U4</text>
+            <text x="848" y="388" fill="#008000" font-size="10">DIP-14  SN74AHCT125N</text>
+            <text x="888" y="230" font-size="12" font-weight="700">U4</text>
+            <g font-size="10" font-family="Consolas">
+              <line x1="850" y1="110" x2="832" y2="110" stroke="#000"/><text x="856" y="114">1 OE1#</text>
+              <line x1="850" y1="140" x2="832" y2="140" stroke="#000"/><text x="856" y="144">2 A1</text>
+              <line x1="850" y1="170" x2="832" y2="170" stroke="#000"/><text x="856" y="174">3 Y1</text>
+              <line x1="850" y1="320" x2="832" y2="320" stroke="#000"/><text x="856" y="324">7 GND</text>
+              <line x1="1000" y1="320" x2="1018" y2="320" stroke="#000"/><text x="932" y="324">VCC 14</text>
+            </g>
+            <!-- pin 1 marker -->
+            <circle cx="862" cy="102" r="3" fill="#000"/>
+          </g>
+
+          <!-- D1 WS2812 -->
+          <g>
+            <rect x="1040" y="140" width="140" height="90" fill="#fff" stroke="#000" stroke-width="1.4"/>
+            <text x="1088" y="130" fill="#800000" font-size="12">D1</text>
+            <text x="1048" y="248" fill="#008000" font-size="10">LED-5050 WS2812B</text>
+            <text x="1078" y="175" font-size="12" font-weight="700">D1</text>
+            <g font-size="10" font-family="Consolas">
+              <text x="1048" y="198">1 VDD  4 DIN</text>
+              <text x="1048" y="216">3 VSS  2 DOUT</text>
+            </g>
+          </g>
+
+          <!-- U6 PAM8403 -->
+          <g>
+            <rect x="850" y="430" width="170" height="130" fill="#fff" stroke="#000" stroke-width="1.4"/>
+            <text x="910" y="420" fill="#800000" font-size="12">U6</text>
+            <text x="860" y="578" fill="#008000" font-size="10">MODULE PAM8403</text>
+            <text x="905" y="490" font-size="12" font-weight="700">U6</text>
+            <g font-size="10" font-family="Consolas">
+              <line x1="850" y1="450" x2="832" y2="450" stroke="#000"/><text x="856" y="454">MUTE</text>
+              <line x1="850" y1="480" x2="832" y2="480" stroke="#000"/><text x="856" y="484">VCC</text>
+              <line x1="850" y1="510" x2="832" y2="510" stroke="#000"/><text x="856" y="514">GND</text>
+              <line x1="850" y1="540" x2="832" y2="540" stroke="#000"/><text x="856" y="544">LIN</text>
+            </g>
+          </g>
+
+          <!-- J_RDK UART -->
+          <g>
+            <rect x="850" y="620" width="170" height="80" fill="#fff" stroke="#000" stroke-width="1.4"/>
+            <text x="900" y="610" fill="#800000" font-size="12">J1</text>
+            <text x="858" y="716" fill="#008000" font-size="10">HDR-3  RDK UART 3.3V</text>
+            <g font-size="10" font-family="Consolas">
+              <line x1="850" y1="640" x2="832" y2="640" stroke="#000"/><text x="856" y="644">1 TXD</text>
+              <line x1="850" y1="660" x2="832" y2="660" stroke="#000"/><text x="856" y="664">2 RXD</text>
+              <line x1="850" y1="680" x2="832" y2="680" stroke="#000"/><text x="856" y="684">3 GND</text>
+            </g>
+          </g>
+
+          <!-- J_RADAR -->
+          <g>
+            <rect x="80" y="560" width="170" height="100" fill="#fff" stroke="#000" stroke-width="1.4"/>
+            <text x="145" y="550" fill="#800000" font-size="12">J2</text>
+            <text x="88" y="678" fill="#008000" font-size="10">HDR-4  R60ABD1 UART</text>
+            <g font-size="10" font-family="Consolas">
+              <line x1="250" y1="580" x2="268" y2="580" stroke="#000"/><text x="88" y="584">5V   1</text>
+              <line x1="250" y1="605" x2="268" y2="605" stroke="#000"/><text x="88" y="609">GND  2</text>
+              <line x1="250" y1="630" x2="268" y2="630" stroke="#000"/><text x="88" y="634">TX   3</text>
+              <line x1="250" y1="650" x2="268" y2="650" stroke="#000"/><text x="88" y="654">RX   4</text>
+            </g>
+          </g>
+
+          <!-- nets -->
+          <path class="trace" data-net="P3V3" fill="none" stroke="#008000" stroke-width="1.6" d="M268 130 H360 V120 H448"/>
+          <path class="trace" data-net="P3V3" fill="none" stroke="#008000" stroke-width="1.4" d="M268 340 H340 V120"/>
+          <path class="trace" data-net="GND" fill="none" stroke="#000" stroke-width="1.6" d="M268 155 H350 V320 H448"/>
+          <path class="trace" data-net="GND" fill="none" stroke="#000" stroke-width="1.4" d="M268 365 H330 V320"/>
+          <path class="trace" data-net="GND" fill="none" stroke="#000" stroke-width="1.4" d="M268 440 H300 V320"/>
+          <path class="trace" data-net="I2C_SDA" fill="none" stroke="#000080" stroke-width="1.5" d="M268 180 H390 V190 H712"/>
+          <path class="trace" data-net="I2C_SDA" fill="none" stroke="#000080" stroke-width="1.3" d="M268 415 H380 V190"/>
+          <path class="trace" data-net="I2C_SCL" fill="none" stroke="#000080" stroke-width="1.5" d="M268 205 H410 V150 H712"/>
+          <path class="trace" data-net="I2C_SCL" fill="none" stroke="#000080" stroke-width="1.3" d="M268 390 H400 V150"/>
+          <path class="trace" data-net="LED_DATA" fill="none" stroke="#000080" stroke-width="1.5" d="M712 290 H760"/>
+          <path class="trace" data-net="LED_DATA" fill="none" stroke="#000080" stroke-width="1.5" d="M810 285 H832 V140"/>
+          <path class="trace" data-net="LED_DATA" fill="none" stroke="#000080" stroke-width="1.5" d="M832 170 H1018 V185 H1040"/>
+          <path class="trace" data-net="MUTE" fill="none" stroke="#000080" stroke-width="1.5" d="M712 330 H780 V450 H832"/>
+          <path class="trace" data-net="UART_RDK" fill="none" stroke="#000080" stroke-width="1.5" d="M712 410 H780 V640 H832"/>
+          <path class="trace" data-net="UART_RDK" fill="none" stroke="#000080" stroke-width="1.3" d="M712 370 H800 V660 H832"/>
+          <path class="trace" data-net="ESTOP" fill="none" stroke="#000080" stroke-width="1.5" d="M712 450 H780 V470"/>
+          <text x="720" y="488" fill="#0000aa" font-size="11">NET ESTOP</text>
+          <path class="trace" data-net="UART_RADAR" fill="none" stroke="#000080" stroke-width="1.4" d="M268 630 H360 V200 H448"/>
+          <path class="trace" data-net="UART_RADAR" fill="none" stroke="#000080" stroke-width="1.3" d="M268 650 H380 V230 H448"/>
+          <path class="trace" data-net="GND" fill="none" stroke="#000" stroke-width="1.3" d="M832 320 V510 H850"/>
+          <path class="trace" data-net="P5V" fill="none" stroke="#cc0000" stroke-width="1.4" d="M448 560 H400 V320 H1018"/>
+          <path class="trace" data-net="CTRL5V" fill="none" stroke="#cc0000" stroke-width="1.4" stroke-dasharray="5 3" d="M1040 160 H1018 V480 H850"/>
+          <path class="trace" data-net="GND" fill="none" stroke="#000" stroke-width="1.2" d="M832 110 V90 H1018 V320"/>
+
+          <text x="32" y="760" font-size="11" fill="#555">固件：PIN_ESTOP=GPIO4　PIN_MUTE=GPIO5　PIN_LED_DATA=GPIO18　UART2 RX=GPIO16 TX=GPIO17　雷达 GPIO25/26 交叉</text>
+          <text x="32" y="778" font-size="11" fill="#555">U4.1 OE1# 接 GND（使能）　U4.14 VCC=P5V　U3.7 AD0 接 GND（地址 0x68）　I2C 上拉模块自带则省略</text>
+
+          <g font-family="Arial" font-size="11">
+            <rect x="860" y="740" width="348" height="52" fill="#fff" stroke="#000"/>
+            <text x="870" y="760">图号 SCH-ASD-MCU-002　　页次 2 / 3　　嘉立创EDA</text>
+            <text x="870" y="780">图名 安全岛原理图　　版本 A.0</text>
+          </g>
+        </svg>
+      </div>
+      <table class="pinmap">
+        <thead><tr><th>位号</th><th>封装</th><th>引脚号</th><th>引脚名</th><th>网络</th><th>对端</th></tr></thead>
+        <tbody>
+          <tr data-net="P3V3"><td>U1</td><td>DevKitC-38</td><td>1</td><td>3V3</td><td>P3V3</td><td>U2.1 U3.1</td></tr>
+          <tr data-net="I2C_SDA"><td>U1</td><td>DevKitC-38</td><td>6</td><td>GPIO21 / SDA</td><td>I2C_SDA</td><td>U2.3 U3.4</td></tr>
+          <tr data-net="I2C_SCL"><td>U1</td><td>DevKitC-38</td><td>3</td><td>GPIO22 / SCL</td><td>I2C_SCL</td><td>U2.4 U3.3</td></tr>
+          <tr data-net="ESTOP"><td>U1</td><td>DevKitC-38</td><td>13</td><td>GPIO4</td><td>ESTOP</td><td>SW2-NO</td></tr>
+          <tr data-net="MUTE"><td>U1</td><td>DevKitC-38</td><td>10</td><td>GPIO5</td><td>MUTE</td><td>U6.MUTE / K1.1</td></tr>
+          <tr data-net="LED_DATA"><td>U1</td><td>DevKitC-38</td><td>9</td><td>GPIO18</td><td>LED_DATA</td><td>R1 → U4.2 A1</td></tr>
+          <tr data-net="UART_RDK"><td>U1</td><td>DevKitC-38</td><td>12</td><td>GPIO16 RX2</td><td>UART_RDK_TX</td><td>J1.1 RDK TX</td></tr>
+          <tr data-net="UART_RDK"><td>U1</td><td>DevKitC-38</td><td>11</td><td>GPIO17 TX2</td><td>UART_RDK_RX</td><td>J1.2 RDK RX</td></tr>
+          <tr data-net="UART_RADAR"><td>U1</td><td>DevKitC-38</td><td>9L</td><td>GPIO25</td><td>RADAR_RX</td><td>J2.4 R60A RX</td></tr>
+          <tr data-net="UART_RADAR"><td>U1</td><td>DevKitC-38</td><td>10L</td><td>GPIO26</td><td>RADAR_TX</td><td>J2.3 R60A TX</td></tr>
+          <tr data-net="LED_DATA"><td>U4</td><td>DIP-14</td><td>1</td><td>OE1#</td><td>GND</td><td>使能</td></tr>
+          <tr data-net="LED_DATA"><td>U4</td><td>DIP-14</td><td>2</td><td>A1</td><td>LED_DATA</td><td>R1</td></tr>
+          <tr data-net="LED_DATA"><td>U4</td><td>DIP-14</td><td>3</td><td>Y1</td><td>LED_5V</td><td>D1.4 DIN</td></tr>
+          <tr data-net="P5V"><td>U4</td><td>DIP-14</td><td>14</td><td>VCC</td><td>P5V</td><td>—</td></tr>
+          <tr data-net="GND"><td>U4</td><td>DIP-14</td><td>7</td><td>GND</td><td>GND</td><td>—</td></tr>
+          <tr data-net="CTRL5V"><td>D1</td><td>LED-5050</td><td>1</td><td>VDD</td><td>CTRL5V</td><td>F3</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ===== SHEET 3 RDK ===== -->
+    <section class="tab-panel" id="tab-rdk" hidden>
+      <div class="sheet-frame">
+        <svg class="sch" viewBox="0 0 1200 640" xmlns="http://www.w3.org/2000/svg">
+          <rect width="1200" height="640" fill="#fff"/>
+          <rect x="16" y="16" width="1168" height="608" fill="url(#g)" stroke="#000" stroke-width="1.6"/>
+          <text x="32" y="44" font-size="16" font-weight="700" font-family="Arial">原理图3  主控外设 HOST</text>
+
+          <g>
+            <rect x="430" y="80" width="200" height="280" fill="#fff" stroke="#000" stroke-width="1.6"/>
+            <text x="505" y="70" fill="#800000" font-size="13">U7</text>
+            <text x="448" y="378" fill="#008000" font-size="10">RDK-X5 8GB  Sunrise5</text>
+            <text x="500" y="210" font-size="13" font-weight="700">U7</text>
+            <g font-size="10" font-family="Consolas">
+              <line x1="430" y1="110" x2="412" y2="110" stroke="#000"/><text x="438" y="114">5V Type-C</text>
+              <line x1="430" y1="150" x2="412" y2="150" stroke="#000"/><text x="438" y="154">GND</text>
+              <line x1="630" y1="140" x2="648" y2="140" stroke="#000"/><text x="500" y="144">USB3 HOST</text>
+              <line x1="430" y1="200" x2="412" y2="200" stroke="#000"/><text x="438" y="204">UART TX</text>
+              <line x1="430" y1="230" x2="412" y2="230" stroke="#000"/><text x="438" y="234">UART RX</text>
+              <line x1="430" y1="270" x2="412" y2="270" stroke="#000"/><text x="438" y="274">3.5mm OUT</text>
+              <line x1="430" y1="310" x2="412" y2="310" stroke="#000"/><text x="438" y="314">40PIN 3.3V</text>
+            </g>
+          </g>
+
+          <g>
+            <rect x="760" y="90" width="160" height="160" fill="#fff" stroke="#000" stroke-width="1.4"/>
+            <text x="815" y="80" fill="#800000" font-size="12">U8</text>
+            <text x="772" y="268" fill="#008000" font-size="10">USB3-HUB-4P 有源</text>
+            <text x="815" y="155" font-size="12" font-weight="700">U8</text>
+            <g font-size="10" font-family="Consolas">
+              <line x1="760" y1="120" x2="742" y2="120" stroke="#000"/><text x="768" y="124">VIN 5V</text>
+              <line x1="920" y1="130" x2="938" y2="130" stroke="#000"/><text x="768" y="154">P1</text>
+              <line x1="920" y1="160" x2="938" y2="160" stroke="#000"/><text x="768" y="184">P2</text>
+              <line x1="920" y1="190" x2="938" y2="190" stroke="#000"/><text x="768" y="214">P3</text>
+            </g>
+          </g>
+
+          <g>
+            <rect x="1000" y="110" width="140" height="40" fill="#fff" stroke="#000"/><text x="1020" y="100" fill="#800000" font-size="12">U9</text>
+            <text x="1018" y="135" font-size="11">Gemini 2 USB-C</text>
+            <rect x="1000" y="170" width="140" height="40" fill="#fff" stroke="#000"/><text x="1020" y="160" fill="#800000" font-size="12">U10</text>
+            <text x="1008" y="195" font-size="11">ReSpeaker v2.0</text>
+            <rect x="1000" y="230" width="140" height="40" fill="#fff" stroke="#000"/><text x="1020" y="220" fill="#800000" font-size="12">U11</text>
+            <text x="1028" y="255" font-size="11">L610-CN</text>
+          </g>
+
+          <g>
+            <rect x="80" y="180" width="150" height="80" fill="#fff" stroke="#000"/>
+            <text x="135" y="170" fill="#800000" font-size="12">J1</text>
+            <text x="100" y="278" fill="#008000" font-size="10">至 U1 UART2</text>
+            <text x="95" y="210" font-size="11">1 TXD → U1.IO16</text>
+            <text x="95" y="230" font-size="11">2 RXD ← U1.IO17</text>
+            <text x="95" y="250" font-size="11">3 GND</text>
+          </g>
+          <g>
+            <rect x="80" y="320" width="150" height="40" fill="#fff" stroke="#000"/>
+            <text x="130" y="310" fill="#800000" font-size="12">R2/R3</text>
+            <text x="105" y="345" font-size="11">限幅衰减网络</text>
+            <rect x="80" y="390" width="150" height="50" fill="#fff" stroke="#000"/>
+            <text x="140" y="380" fill="#800000" font-size="12">U6</text>
+            <text x="110" y="420" font-size="11">PAM8403 LIN</text>
+            <rect x="80" y="470" width="150" height="40" fill="#fff" stroke="#000"/>
+            <text x="135" y="460" fill="#800000" font-size="12">LS1</text>
+            <text x="115" y="495" font-size="11">SPK 3W 4Ω</text>
+          </g>
+
+          <path class="trace" data-net="USB_HOST" fill="none" stroke="#000080" stroke-width="1.8" d="M648 140 H742"/>
+          <path class="trace" data-net="USB_HOST" fill="none" stroke="#000080" stroke-width="1.4" d="M938 130 H1000"/>
+          <path class="trace" data-net="USB_HOST" fill="none" stroke="#000080" stroke-width="1.4" d="M938 160 H1000"/>
+          <path class="trace" data-net="USB_HOST" fill="none" stroke="#000080" stroke-width="1.4" d="M938 190 H1000"/>
+          <path class="trace" data-net="UART_RDK" fill="none" stroke="#000080" stroke-width="1.5" d="M412 200 H230 V210"/>
+          <path class="trace" data-net="UART_RDK" fill="none" stroke="#000080" stroke-width="1.3" d="M412 230 H250 V230"/>
+          <path class="trace" data-net="AUDIO" fill="none" stroke="#000080" stroke-width="1.5" d="M412 270 H250 V340 H230"/>
+          <path class="trace" data-net="AUDIO" fill="none" stroke="#000080" stroke-width="1.3" d="M155 360 V390"/>
+          <path class="trace" data-net="AUDIO" fill="none" stroke="#000080" stroke-width="1.3" d="M155 440 V470"/>
+          <path class="trace" data-net="P5V" fill="none" stroke="#cc0000" stroke-width="1.6" d="M412 110 H380 V120 H742"/>
+
+          <g font-family="Arial" font-size="11">
+            <rect x="820" y="500" width="348" height="108" fill="#fff" stroke="#000"/>
+            <text x="832" y="522">图号 SCH-ASD-HOST-003　　页次 3 / 3</text>
+            <text x="832" y="544">图名 主控外设原理图　　嘉立创EDA</text>
+            <text x="832" y="566">USB 大电流必须经有源 Hub</text>
+            <text x="832" y="588">UART 3.3V 直连，5V 设备加电平转换</text>
+          </g>
+        </svg>
+      </div>
+      <table class="pinmap">
+        <thead><tr><th>位号</th><th>封装</th><th>引脚</th><th>网络</th><th>对端</th></tr></thead>
+        <tbody>
+          <tr data-net="USB_HOST"><td>U7</td><td>RDK-X5</td><td>USB3 Host</td><td>USB_HOST</td><td>U8 VIN/Upstream</td></tr>
+          <tr data-net="USB_HOST"><td>U8</td><td>HUB-4P</td><td>P1</td><td>USB_P1</td><td>U9 Gemini2</td></tr>
+          <tr data-net="USB_HOST"><td>U8</td><td>HUB-4P</td><td>P2</td><td>USB_P2</td><td>U10 ReSpeaker</td></tr>
+          <tr data-net="USB_HOST"><td>U8</td><td>HUB-4P</td><td>P3</td><td>USB_P3</td><td>U11 L610-CN</td></tr>
+          <tr data-net="UART_RDK"><td>U7</td><td>HDR-40</td><td>UART TX/RX</td><td>UART_RDK</td><td>J1 → U1.12/11</td></tr>
+          <tr data-net="AUDIO"><td>U7</td><td>AUDIO-3.5</td><td>OUT</td><td>AUDIO</td><td>R2/R3 → U6.LIN → LS1</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ===== FOOTPRINT PINOUTS ===== -->
+    <section class="tab-panel" id="tab-fp" hidden>
+      <p class="hint">以下为立创EDA 器件库常见的<strong>封装顶视图引脚图</strong>（Pin1 圆点标记，引脚号绕封装排布），用于对照原理图位号焊接。</p>
+      <div class="sheet-frame">
+        <svg class="sch" viewBox="0 0 1200 720" xmlns="http://www.w3.org/2000/svg">
+          <rect width="1200" height="720" fill="#fff"/>
+          <rect x="16" y="16" width="1168" height="688" fill="url(#g)" stroke="#000" stroke-width="1.6"/>
+          <text x="32" y="44" font-size="16" font-weight="700" font-family="Arial">封装引脚图  PCB Footprint Pinout</text>
+          <text x="32" y="62" font-size="11" fill="#555">顶视 · Pin1 圆点 · 与嘉立创封装预览一致</text>
+
+          <!-- DIP-14 U4 -->
+          <g transform="translate(60,100)">
+            <text x="70" y="-8" fill="#800000" font-size="13">U4 SN74AHCT125N  DIP-14</text>
+            <rect x="40" y="20" width="80" height="200" fill="#1a1a1a" stroke="#333" stroke-width="1"/>
+            <rect x="48" y="28" width="64" height="184" fill="#2a2a2a"/>
+            <circle cx="60" cy="40" r="5" fill="#d4a017"/>
+            <text x="58" y="128" fill="#fff" font-size="11">AHCT125</text>
+            <g font-size="10" font-family="Consolas" fill="#000">
+              <rect x="16" y="28" width="24" height="12" fill="#c0c0c0" stroke="#666"/><text x="-2" y="38">1</text>
+              <rect x="16" y="52" width="24" height="12" fill="#c0c0c0" stroke="#666"/><text x="-2" y="62">2</text>
+              <rect x="16" y="76" width="24" height="12" fill="#c0c0c0" stroke="#666"/><text x="-2" y="86">3</text>
+              <rect x="16" y="100" width="24" height="12" fill="#c0c0c0" stroke="#666"/><text x="-2" y="110">4</text>
+              <rect x="16" y="124" width="24" height="12" fill="#c0c0c0" stroke="#666"/><text x="-2" y="134">5</text>
+              <rect x="16" y="148" width="24" height="12" fill="#c0c0c0" stroke="#666"/><text x="-2" y="158">6</text>
+              <rect x="16" y="172" width="24" height="12" fill="#c0c0c0" stroke="#666"/><text x="-2" y="182">7</text>
+              <rect x="120" y="172" width="24" height="12" fill="#c0c0c0" stroke="#666"/><text x="148" y="182">8</text>
+              <rect x="120" y="148" width="24" height="12" fill="#c0c0c0" stroke="#666"/><text x="148" y="158">9</text>
+              <rect x="120" y="124" width="24" height="12" fill="#c0c0c0" stroke="#666"/><text x="146" y="134">10</text>
+              <rect x="120" y="100" width="24" height="12" fill="#c0c0c0" stroke="#666"/><text x="146" y="110">11</text>
+              <rect x="120" y="76" width="24" height="12" fill="#c0c0c0" stroke="#666"/><text x="146" y="86">12</text>
+              <rect x="120" y="52" width="24" height="12" fill="#c0c0c0" stroke="#666"/><text x="146" y="62">13</text>
+              <rect x="120" y="28" width="24" height="12" fill="#c0c0c0" stroke="#666"/><text x="146" y="38">14</text>
+            </g>
+            <text x="0" y="250" font-size="10" font-family="Consolas">1 OE1#  2 A1  3 Y1  7 GND  14 VCC</text>
+            <text x="0" y="266" font-size="10" font-family="Consolas">本板只用通道1：2←R1  3→D1.DIN</text>
+          </g>
+
+          <!-- WS2812 5050 -->
+          <g transform="translate(320,100)">
+            <text x="10" y="-8" fill="#800000" font-size="13">D1 WS2812B  LED-5050</text>
+            <rect x="40" y="40" width="90" height="90" fill="#1a1a1a" rx="4"/>
+            <polygon points="40,40 58,40 40,58" fill="#d4a017"/>
+            <circle cx="85" cy="85" r="22" fill="#333"/>
+            <g font-size="10" font-family="Consolas">
+              <rect x="20" y="48" width="18" height="18" fill="#c0c0c0" stroke="#666"/><text x="4" y="62">1</text>
+              <rect x="132" y="48" width="18" height="18" fill="#c0c0c0" stroke="#666"/><text x="154" y="62">2</text>
+              <rect x="132" y="104" width="18" height="18" fill="#c0c0c0" stroke="#666"/><text x="154" y="118">3</text>
+              <rect x="20" y="104" width="18" height="18" fill="#c0c0c0" stroke="#666"/><text x="4" y="118">4</text>
+            </g>
+            <text x="10" y="160" font-size="10" font-family="Consolas">1 VDD  2 DOUT</text>
+            <text x="10" y="176" font-size="10" font-family="Consolas">3 VSS  4 DIN</text>
+          </g>
+
+          <!-- GY-521 -->
+          <g transform="translate(560,100)">
+            <text x="0" y="-8" fill="#800000" font-size="13">U3 MPU-6050  GY-521</text>
+            <rect x="30" y="20" width="130" height="180" fill="#1e5a32" stroke="#0a3" stroke-width="1"/>
+            <circle cx="46" cy="36" r="5" fill="#d4a017"/>
+            <text x="60" y="40" fill="#fff" font-size="10">GY-521</text>
+            <g font-size="10" fill="#fff" font-family="Consolas">
+              <text x="40" y="70">1 VCC</text>
+              <text x="40" y="90">2 GND</text>
+              <text x="40" y="110">3 SCL</text>
+              <text x="40" y="130">4 SDA</text>
+              <text x="40" y="150">5 XDA</text>
+              <text x="40" y="170">6 XCL</text>
+              <text x="40" y="188">7 AD0  8 INT</text>
+            </g>
+            <g>
+              <rect x="10" y="60" width="16" height="10" fill="#c0c0c0"/><rect x="10" y="80" width="16" height="10" fill="#c0c0c0"/>
+              <rect x="10" y="100" width="16" height="10" fill="#c0c0c0"/><rect x="10" y="120" width="16" height="10" fill="#c0c0c0"/>
             </g>
           </g>
 
           <!-- MPR121 -->
-          <g class="chip-block" data-name="MPR121">
-            <rect class="ic-body" x="60" y="120" width="140" height="130" rx="4"/>
-            <text class="ic-silk" x="95" y="150">MPR121</text>
-            <text class="pad-label" x="70" y="180">VCC</text>
-            <text class="pad-label" x="70" y="200">GND</text>
-            <text class="pad-label" x="70" y="220">SDA</text>
-            <text class="pad-label" x="70" y="240">SCL</text>
-            <circle cx="200" cy="176" r="4" fill="var(--pad)"/><circle cx="200" cy="196" r="4" fill="var(--pad)"/>
-            <circle cx="200" cy="216" r="4" fill="var(--pad)"/><circle cx="200" cy="236" r="4" fill="var(--pad)"/>
+          <g transform="translate(860,100)">
+            <text x="0" y="-8" fill="#800000" font-size="13">U2 MPR121  SOP-20</text>
+            <rect x="50" y="20" width="70" height="220" fill="#1a1a1a"/>
+            <circle cx="62" cy="36" r="5" fill="#d4a017"/>
+            <text x="58" y="130" fill="#fff" font-size="10">MPR121</text>
+            <g font-size="9" font-family="Consolas">
+              <text x="8" y="40">1</text><rect x="28" y="30" width="22" height="10" fill="#c0c0c0"/>
+              <text x="8" y="62">2</text><rect x="28" y="52" width="22" height="10" fill="#c0c0c0"/>
+              <text x="126" y="40">20</text><rect x="120" y="30" width="22" height="10" fill="#c0c0c0"/>
+            </g>
+            <text x="0" y="260" font-size="10" font-family="Consolas">模块引出：VIN GND SDA SCL</text>
+            <text x="0" y="276" font-size="10" font-family="Consolas">ELE0-3 → 铜箔电极</text>
           </g>
 
-          <!-- IMU -->
-          <g class="chip-block" data-name="MPU6050">
-            <rect class="ic-body" x="60" y="300" width="140" height="140" rx="4"/>
-            <text class="ic-silk" x="90" y="330">MPU6050</text>
-            <text class="pad-label" x="70" y="360">VCC</text>
-            <text class="pad-label" x="70" y="380">GND</text>
-            <text class="pad-label" x="70" y="400">SDA</text>
-            <text class="pad-label" x="70" y="420">SCL</text>
-            <circle cx="200" cy="356" r="4" fill="var(--pad)"/><circle cx="200" cy="376" r="4" fill="var(--pad)"/>
-            <circle cx="200" cy="396" r="4" fill="var(--pad)"/><circle cx="200" cy="416" r="4" fill="var(--pad)"/>
+          <!-- ESP32 DevKit top -->
+          <g transform="translate(60,420)">
+            <text x="0" y="-8" fill="#800000" font-size="13">U1 ESP32-WROOM-32 DevKitC  顶视排针</text>
+            <rect x="80" y="10" width="280" height="120" fill="#1e4d9c" stroke="#123" rx="4"/>
+            <rect x="150" y="30" width="140" height="70" fill="#c0c0c0" stroke="#666"/>
+            <text x="170" y="70" font-size="11" font-family="Consolas">ESP32-WROOM-32</text>
+            <circle cx="160" cy="40" r="4" fill="#d4a017"/>
+            <text x="90" y="28" fill="#fff" font-size="9">USB</text>
+            <g font-size="8" font-family="Consolas" fill="#fff">
+              <text x="84" y="150">L1 3V3  L9 IO25  L10 IO26  L14 GND  L19 5V</text>
+              <text x="84" y="166">R3 IO22  R6 IO21  R9 IO18  R10 IO5  R11 IO17  R12 IO16  R13 IO4</text>
+            </g>
+            <!-- header pads -->
+            <g fill="#c0c0c0">
+              <rect x="70" y="20" width="10" height="100"/>
+              <rect x="360" y="20" width="10" height="100"/>
+            </g>
           </g>
 
-          <!-- ESTOP -->
-          <g class="chip-block" data-name="急停 NO">
-            <rect class="ic-body" x="60" y="480" width="140" height="70" rx="4"/>
-            <text class="ic-silk" x="85" y="510">ESTOP NO</text>
-            <text class="ic-silk" x="75" y="530">→GPIO4 / GND</text>
-          </g>
-
-          <!-- AHCT125 -->
-          <g class="chip-block" data-name="74AHCT125">
-            <rect class="ic-body" x="760" y="120" width="150" height="120" rx="4"/>
-            <text class="ic-silk" x="780" y="150">74AHCT125</text>
-            <text class="pad-label" x="775" y="175">A1←</text>
-            <text class="pad-label" x="775" y="195">Y1→</text>
-            <text class="pad-label" x="775" y="215">VCC=5V</text>
-            <text class="pad-label" x="775" y="230">OE#=GND</text>
-          </g>
-
-          <!-- R330 -->
-          <g class="chip-block" data-name="330Ω">
-            <rect class="ic-body" x="700" y="220" width="40" height="20" rx="2"/>
-            <text class="ic-silk" x="705" y="234" font-size="9">330Ω</text>
-          </g>
-
-          <!-- WS2812 -->
-          <g class="chip-block" data-name="WS2812B">
-            <rect class="ic-body" x="980" y="140" width="140" height="90" rx="4"/>
-            <text class="ic-silk" x="1010" y="175">WS2812B</text>
-            <text class="pad-label" x="995" y="200">DIN / 5V / GND</text>
-          </g>
-
-          <!-- MUTE / Relay -->
-          <g class="chip-block" data-name="MUTE/继电器 IN">
-            <rect class="ic-body" x="760" y="320" width="150" height="70" rx="4"/>
-            <text class="ic-silk" x="780" y="350">MUTE / RELAY</text>
-            <text class="ic-silk" x="800" y="370">IN ← GPIO5</text>
-          </g>
-
-          <!-- RDK UART -->
-          <g class="chip-block" data-name="RDK UART">
-            <rect class="ic-body" x="760" y="420" width="150" height="80" rx="4"/>
-            <text class="ic-silk" x="790" y="450">RDK UART</text>
-            <text class="pad-label" x="775" y="470">TX → GPIO16</text>
-            <text class="pad-label" x="775" y="488">RX ← GPIO17</text>
-          </g>
-
-          <!-- Radar -->
-          <g class="chip-block" data-name="R60A">
-            <rect class="ic-body" x="980" y="400" width="140" height="100" rx="4"/>
-            <text class="ic-silk" x="1020" y="435">R60A</text>
-            <text class="pad-label" x="995" y="460">TX→GPIO26</text>
-            <text class="pad-label" x="995" y="478">RX←GPIO25</text>
-            <text class="pad-label" x="995" y="490">5V/GND</text>
-          </g>
-
-          <!-- Nets -->
-          <path class="trace" data-net="3V3" stroke="var(--v33)" stroke-width="3" d="M200 176 H300 V250 H430"/>
-          <path class="trace" data-net="3V3" stroke="var(--v33)" stroke-width="2.5" d="M200 356 H280 V250"/>
-          <path class="trace" data-net="GND" stroke="var(--gnd)" stroke-width="3" d="M200 196 H320 V280 H430"/>
-          <path class="trace" data-net="GND" stroke="var(--gnd)" stroke-width="2.5" d="M200 376 H300 V280"/>
-          <path class="trace" data-net="I2C_SDA" stroke="var(--sig)" stroke-width="2.5" d="M200 216 H350 V310 H430"/>
-          <path class="trace" data-net="I2C_SDA" stroke="var(--sig)" stroke-width="2" d="M200 396 H340 V310"/>
-          <path class="trace" data-net="I2C_SCL" stroke="#ffb347" stroke-width="2.5" d="M200 236 H360 V340 H430"/>
-          <path class="trace" data-net="I2C_SCL" stroke="#ffb347" stroke-width="2" d="M200 416 H350 V340"/>
-          <path class="trace" data-net="ESTOP" stroke="#ff6b6b" stroke-width="2.5" d="M200 515 H300 V370 H430"/>
-          <path class="trace" data-net="MUTE" stroke="#ff8c42" stroke-width="2.5" d="M430 400 H700 V355 H760"/>
-          <path class="trace" data-net="LED_DATA" stroke="var(--sig)" stroke-width="2.5" d="M630 250 H700 V230 H720"/>
-          <path class="trace" data-net="LED_DATA" stroke="var(--sig)" stroke-width="2.5" d="M740 230 H760 V175"/>
-          <path class="trace" data-net="LED_DATA" stroke="var(--sig)" stroke-width="2.5" d="M910 185 H980"/>
-          <path class="trace" data-net="UART_RDK" stroke="#7dd3fc" stroke-width="2.5" d="M630 290 H720 V450 H760"/>
-          <path class="trace" data-net="UART_RDK" stroke="#7dd3fc" stroke-width="2" d="M630 330 H700 V470 H760"/>
-          <path class="trace" data-net="UART_RADAR" stroke="#c4b5fd" stroke-width="2.5" d="M630 380 H900 V440 H980"/>
-          <path class="trace" data-net="UART_RADAR" stroke="#c4b5fd" stroke-width="2" d="M630 420 H880 V470 H980"/>
-
-          <text x="28" y="600" fill="var(--muted)" font-size="12">固件：PIN_ESTOP=4 · PIN_MUTE=5 · PIN_LED_DATA=18 · UART2 RX16/TX17 · 雷达可选 25/26（交叉）</text>
+          <text x="32" y="680" font-size="11" fill="#555">焊接注意：DIP-14 Pin1 与芯片凹槽同侧；WS2812B Pin1 为切角；I2C 器件与 U1 共 3V3/GND。</text>
         </svg>
-      </div>
-      <div class="net-list" data-board="esp">
-        <div class="net" data-net="3V3"><strong>3V3</strong>ESP32 3V3 → MPR121 VCC · MPU6050 VCC</div>
-        <div class="net" data-net="I2C_SDA"><strong>I²C SDA</strong>GPIO21 ↔ MPR121 SDA · IMU SDA</div>
-        <div class="net" data-net="I2C_SCL"><strong>I²C SCL</strong>GPIO22 ↔ MPR121 SCL · IMU SCL</div>
-        <div class="net" data-net="ESTOP"><strong>ESTOP</strong>急停 NO → GPIO4（另一端 GND）</div>
-        <div class="net" data-net="MUTE"><strong>MUTE</strong>GPIO5 → PAM8403 MUTE / 继电器 IN</div>
-        <div class="net" data-net="LED_DATA"><strong>LED_DATA</strong>GPIO18 → 330Ω → AHCT125 A1 → Y1 → WS2812 DIN</div>
-        <div class="net" data-net="UART_RDK"><strong>UART↔RDK</strong>GPIO16←RDK TX · GPIO17→RDK RX</div>
-        <div class="net" data-net="UART_RADAR"><strong>UART↔R60A</strong>GPIO26←雷达 TX · GPIO25→雷达 RX</div>
-        <div class="net" data-net="GND"><strong>GND</strong>安全岛各模块共地</div>
       </div>
     </section>
 
-    <!-- ================= RDK ================= -->
-    <section class="panel tab-panel" id="tab-rdk" hidden>
-      <h2>③ RDK-X5 外设总线 PCB</h2>
-      <div class="board-wrap">
-        <svg class="pcb" viewBox="0 0 1100 520" xmlns="http://www.w3.org/2000/svg">
-          <rect width="1100" height="520" fill="var(--mask)"/>
-          <rect x="12" y="12" width="1076" height="496" rx="8" fill="#0b2a20" stroke="#1f6b4f" stroke-width="2"/>
-          <text x="28" y="40" fill="var(--silk)" font-size="16" font-family="ui-monospace,Consolas,monospace">RDK_X5 · HOST BUS</text>
-
-          <g class="chip-block" data-name="RDK-X5 8GB">
-            <rect class="ic-body" x="380" y="120" width="220" height="280" rx="6"/>
-            <text class="ic-silk" x="430" y="160">RDK-X5 8GB</text>
-            <text class="pad-label" x="400" y="200">Type-C 5V</text>
-            <text class="pad-label" x="400" y="230">USB3 Host</text>
-            <text class="pad-label" x="400" y="260">40PIN UART</text>
-            <text class="pad-label" x="400" y="290">3.5mm OUT</text>
-            <text class="pad-label" x="400" y="320">TF / FAN</text>
-            <text class="pad-label" x="400" y="350">ETH / WiFi</text>
-            <circle cx="380" cy="196" r="5" fill="var(--pad)"/><circle cx="380" cy="226" r="5" fill="var(--pad)"/>
-            <circle cx="380" cy="256" r="5" fill="var(--pad)"/><circle cx="380" cy="286" r="5" fill="var(--pad)"/>
-            <circle cx="600" cy="226" r="5" fill="var(--pad)"/><circle cx="600" cy="256" r="5" fill="var(--pad)"/>
-            <circle cx="600" cy="286" r="5" fill="var(--pad)"/>
-          </g>
-
-          <g class="chip-block" data-name="有源 USB3 Hub">
-            <rect class="ic-body" x="700" y="80" width="160" height="160" rx="4"/>
-            <text class="ic-silk" x="730" y="115">USB3 Hub</text>
-            <text class="ic-silk" x="725" y="135">有源 ≥2A</text>
-            <text class="pad-label" x="720" y="165">P1 Gemini</text>
-            <text class="pad-label" x="720" y="185">P2 Mic</text>
-            <text class="pad-label" x="720" y="205">P3 L610</text>
-            <text class="pad-label" x="720" y="225">DC 5V IN</text>
-          </g>
-
-          <g class="chip-block" data-name="Gemini 2"><rect class="ic-body" x="920" y="70" width="130" height="50" rx="3"/><text class="ic-silk" x="945" y="100">Gemini 2</text></g>
-          <g class="chip-block" data-name="ReSpeaker"><rect class="ic-body" x="920" y="135" width="130" height="50" rx="3"/><text class="ic-silk" x="940" y="165">ReSpeaker</text></g>
-          <g class="chip-block" data-name="L610"><rect class="ic-body" x="920" y="200" width="130" height="50" rx="3"/><text class="ic-silk" x="955" y="230">L610</text></g>
-
-          <g class="chip-block" data-name="ESP32 UART">
-            <rect class="ic-body" x="80" y="200" width="140" height="80" rx="4"/>
-            <text class="ic-silk" x="105" y="235">ESP32</text>
-            <text class="ic-silk" x="100" y="255">UART2</text>
-          </g>
-
-          <g class="chip-block" data-name="音频链路">
-            <rect class="ic-body" x="80" y="320" width="140" height="50" rx="3"/><text class="ic-silk" x="100" y="350">限幅网络</text>
-            <rect class="ic-body" x="80" y="390" width="140" height="50" rx="3"/><text class="ic-silk" x="105" y="420">PAM8403</text>
-            <rect class="ic-body" x="80" y="450" width="140" height="40" rx="3"/><text class="ic-silk" x="110" y="475">SPEAKER</text>
-          </g>
-
-          <path class="trace" data-net="USB_HOST" stroke="var(--usb)" stroke-width="3.5" d="M600 226 H700"/>
-          <path class="trace" data-net="USB_HOST" stroke="var(--usb)" stroke-width="2.5" d="M860 100 H920"/>
-          <path class="trace" data-net="USB_HOST" stroke="var(--usb)" stroke-width="2.5" d="M860 160 H920"/>
-          <path class="trace" data-net="USB_HOST" stroke="var(--usb)" stroke-width="2.5" d="M860 220 H920"/>
-          <path class="trace" data-net="UART_RDK" stroke="#7dd3fc" stroke-width="3" d="M380 256 H220 V240 H220"/>
-          <path class="trace" data-net="AUDIO" stroke="var(--sig)" stroke-width="3" d="M380 286 H250 V345 H220"/>
-          <path class="trace" data-net="AUDIO" stroke="var(--sig)" stroke-width="2.5" d="M150 370 V390"/>
-          <path class="trace" data-net="AUDIO" stroke="var(--sig)" stroke-width="2.5" d="M150 440 V450"/>
-          <path class="trace" data-net="5V" stroke="var(--v5)" stroke-width="3" d="M380 196 H300 V60 H780 V225"/>
-
-          <text x="28" y="500" fill="var(--muted)" font-size="12">大电流外设必须经有源 Hub；RDK 40PIN UART 为 3.3V，与 ESP32 直连交叉 TX/RX + 共 GND。</text>
-        </svg>
-      </div>
-      <div class="net-list" data-board="rdk">
-        <div class="net" data-net="USB_HOST"><strong>USB3</strong>RDK Host → Hub → Gemini / ReSpeaker / L610</div>
-        <div class="net" data-net="UART_RDK"><strong>UART</strong>RDK 40PIN ↔ ESP32 GPIO16/17（交叉）</div>
-        <div class="net" data-net="AUDIO"><strong>AUDIO</strong>3.5mm → 限幅 → PAM8403 → 喇叭</div>
-        <div class="net" data-net="5V"><strong>+5V</strong>主轨供 RDK Type-C 与 Hub 外电</div>
-      </div>
-    </section>
-
-    <footer>
-      非医疗竞赛样机接线示意 · 以 <code>docs/HARDWARE_WIRING_FLASH.md</code> 为准 ·
-      <a href="index.html" style="color:var(--accent)">执行计划首页</a>
-    </footer>
+    <p class="hint">这是立创 EDA 风格的工程出图（原理图符号 + DIP/SOP/5050 封装顶视），不是绿油 3D 板渲染。导入嘉立创画板时：按位号建库、按引脚号布线、网络名与上表一致即可。</p>
+    <footer>SCH-ASD-001 A.0 · 非医疗竞赛样机 · <a href="index.html">返回执行计划</a></footer>
   </div>
-
   <script>
     const tip = document.getElementById('tip');
     const tabs = [...document.querySelectorAll('.nav .tab')];
@@ -482,59 +702,49 @@
       pwr: document.getElementById('tab-pwr'),
       esp: document.getElementById('tab-esp'),
       rdk: document.getElementById('tab-rdk'),
+      fp: document.getElementById('tab-fp'),
     };
-
-    tabs.forEach(btn => {
+    tabs.forEach((btn) => {
       btn.addEventListener('click', () => {
-        tabs.forEach(b => b.classList.remove('active'));
+        tabs.forEach((b) => b.classList.remove('active'));
         btn.classList.add('active');
-        Object.entries(panels).forEach(([k, el]) => {
-          el.hidden = k !== btn.dataset.tab;
-        });
+        Object.entries(panels).forEach(([k, el]) => { el.hidden = k !== btn.dataset.tab; });
         clearHot();
       });
     });
-
     function clearHot() {
-      document.querySelectorAll('.trace').forEach(t => {
-        t.classList.remove('hot', 'dim');
+      document.querySelectorAll('.trace').forEach((t) => {
+        t.style.strokeWidth = '';
+        t.style.filter = '';
+        t.style.opacity = '';
       });
-      document.querySelectorAll('.net').forEach(n => n.classList.remove('on'));
+      document.querySelectorAll('tr[data-net]').forEach((r) => r.classList.remove('hot'));
     }
-
     function highlight(net) {
-      document.querySelectorAll('.trace').forEach(t => {
-        const match = t.dataset.net === net;
-        t.classList.toggle('hot', match);
-        t.classList.toggle('dim', !match);
+      document.querySelectorAll('.trace').forEach((t) => {
+        const on = t.dataset.net === net;
+        t.style.opacity = on ? '1' : '0.18';
+        t.style.strokeWidth = on ? '3' : '';
+        t.style.filter = on ? 'drop-shadow(0 0 2px #ff6600)' : '';
       });
-      document.querySelectorAll('.net').forEach(n => {
-        n.classList.toggle('on', n.dataset.net === net);
+      document.querySelectorAll('tr[data-net]').forEach((r) => {
+        r.classList.toggle('hot', r.dataset.net === net);
       });
     }
-
-    document.querySelectorAll('.net').forEach(n => {
-      n.addEventListener('click', () => highlight(n.dataset.net));
-    });
-    document.querySelectorAll('.trace').forEach(t => {
+    document.querySelectorAll('.trace').forEach((t) => {
       t.style.cursor = 'pointer';
       t.addEventListener('click', () => highlight(t.dataset.net));
       t.addEventListener('mousemove', (e) => {
         tip.style.display = 'block';
         tip.style.left = e.clientX + 12 + 'px';
         tip.style.top = e.clientY + 12 + 'px';
-        tip.textContent = '网络: ' + t.dataset.net;
+        tip.textContent = 'NET  ' + t.dataset.net;
       });
       t.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
     });
-    document.querySelectorAll('.chip-block').forEach(g => {
-      g.addEventListener('mousemove', (e) => {
-        tip.style.display = 'block';
-        tip.style.left = e.clientX + 12 + 'px';
-        tip.style.top = e.clientY + 12 + 'px';
-        tip.textContent = g.dataset.name || '器件';
-      });
-      g.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+    document.querySelectorAll('tr[data-net]').forEach((r) => {
+      r.style.cursor = 'pointer';
+      r.addEventListener('click', () => highlight(r.dataset.net));
     });
     document.getElementById('clearNet').addEventListener('click', clearHot);
   </script>
