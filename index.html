@@ -265,7 +265,7 @@
       <a href="#roles">三人分工</a>
       <a href="#weeks">12 周节奏</a>
       <a href="#features">功能顺序</a>
-      <a href="#bom">器材采买</a>
+      <a href="#bom">采购厂家型号</a>
       <a href="#wiring">连线步骤</a>
       <a href="#app">应用设计</a>
       <a href="#lab">实验室验证</a>
@@ -316,7 +316,7 @@
           <div class="label">W1–2</div>
           <div>
             <strong>启动与采购</strong>
-            <div class="muted">锁 BOM 下单；仿真全绿；电源 / Hub / 急停回路草样（P1+P2+P3）。</div>
+            <div class="muted">按下方「厂家 / 定型型号」表一次下单；到货核验；仿真全绿；电源 / Hub / 急停草样（P1 主导）。</div>
           </div>
         </div>
         <div class="week">
@@ -365,29 +365,209 @@
     </section>
 
     <section class="block" id="bom">
-      <h2>四、器材采买（P1 · W1 一次下单）</h2>
-      <div class="banner">到货核验：型号、接口电平、是否支持 RDK Ubuntu / Linux ARM64 驱动。</div>
+      <h2>四、采购期间 · 厂家与定型型号（必须按表购买）</h2>
+      <div class="banner">
+        <strong>采购窗口 W1（P1 负责）</strong>：样机主 BOM 一次下单。<br/>
+        <strong>采购/借用窗口 W8–W9（P3 负责）</strong>：实验室验证仪器。<br/>
+        到货核验三项：厂家+完整型号铭牌、接口电平、RDK Ubuntu / Linux ARM64 驱动可用性。
+      </div>
+
+      <h3>4.1 主控与存储（W1）</h3>
       <table>
         <thead>
-          <tr><th>类别</th><th>推荐型号</th><th>数量</th><th>备注</th></tr>
+          <tr><th>序号</th><th>名称</th><th>厂家 / 品牌</th><th>定型型号（写清再下单）</th><th>数量</th><th>建议渠道</th><th>备注</th></tr>
         </thead>
         <tbody>
-          <tr><td>主控</td><td>地平线 RDK-X5 8GB</td><td>1</td><td>端侧 AI</td></tr>
-          <tr><td>存储 / 散热</td><td>高耐久 128GB TF + 官方风扇套件</td><td>1</td><td>—</td></tr>
-          <tr><td>相机</td><td>Orbbec Gemini（核验 ARM64）</td><td>1</td><td>USB3 经有源 Hub</td></tr>
-          <tr><td>麦克风</td><td>ReSpeaker Mic Array v2.0 等</td><td>1</td><td>含 AEC 优先</td></tr>
-          <tr><td>毫米波</td><td>R60A 明确子型号</td><td>1</td><td>仅存在/微动</td></tr>
-          <tr><td>安全 MCU</td><td>ESP32-WROOM DevKit</td><td>1</td><td>安全岛</td></tr>
-          <tr><td>触摸 / IMU</td><td>MPR121 + MPU6050/ICM-20948</td><td>各1</td><td>真 I²C；倾倒检测</td></tr>
-          <tr><td>灯环</td><td>WS2812B + 乳白罩 + 74AHCT125</td><td>1套</td><td>禁止 PCA9685 直驱</td></tr>
-          <tr><td>音频</td><td>PAM8403 + 3W 喇叭</td><td>1套</td><td>硬件电位器先约 40%</td></tr>
-          <tr><td>急停切电</td><td>蘑菇头急停 + 5V 继电器</td><td>1套</td><td>优先切灯/功放 5V</td></tr>
-          <tr><td>通信</td><td>广和通 L610 Cat.1 开发板</td><td>1</td><td>独立供电 + MQTT</td></tr>
-          <tr><td>供电</td><td>12V 电池 + 12→5V ≥6A + 有源 USB3 Hub</td><td>1套</td><td>分支供电</td></tr>
+          <tr>
+            <td>A1</td><td>主控板</td><td>地平线 Horizon</td>
+            <td><strong>RDK-X5 8GB</strong>（Sunrise5）</td><td>1</td>
+            <td>地平线官方商城 / 授权代理</td><td>端侧 AI；勿买 4GB 版除非确认够用</td>
+          </tr>
+          <tr>
+            <td>A2</td><td>系统卡</td><td>Samsung 或 Kingston</td>
+            <td><strong>Samsung PRO Endurance 128GB</strong> 或 <strong>Kingston High Endurance 128GB</strong></td><td>1</td>
+            <td>京东自营 / 品牌旗舰店</td><td>高耐久；避免杂牌 TF</td>
+          </tr>
+          <tr>
+            <td>A3</td><td>散热</td><td>地平线 Horizon</td>
+            <td>RDK-X5 <strong>官方风扇+散热片套件</strong></td><td>1</td>
+            <td>与主板同店配套</td><td>—</td>
+          </tr>
+          <tr>
+            <td>A4</td><td>调试电源</td><td>地平线 Horizon</td>
+            <td>官方 <strong>5V/5A Type-C</strong> 适配器</td><td>1</td>
+            <td>官方/授权店</td><td>台架调试用；整机后改电池</td>
+          </tr>
         </tbody>
       </table>
-      <h3>实验室验证另购 / 借用</h3>
-      <p>4 通道示波器、IEC 61672-1 Class 2 声级计、照度计、倾角台、UART 断线开关。（手机声级计 App 不可替代。）</p>
+
+      <h3>4.2 感知（W1）</h3>
+      <table>
+        <thead>
+          <tr><th>序号</th><th>名称</th><th>厂家 / 品牌</th><th>定型型号</th><th>数量</th><th>建议渠道</th><th>备注</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>B1</td><td>双目深度相机</td><td>奥比中光 Orbbec</td>
+            <td><strong>Gemini 2</strong>（首选）或 <strong>Gemini 335L</strong></td><td>1</td>
+            <td>奥比中光官网 / 授权代理</td><td>采购前核验 OrbbecSDK + RDK Ubuntu ARM64</td>
+          </tr>
+          <tr>
+            <td>B2</td><td>麦克风阵列</td><td>Seeed Studio（聆思方案）</td>
+            <td><strong>ReSpeaker Mic Array v2.0</strong>（USB，含 AEC）</td><td>1</td>
+            <td>Seeed 官网 / 立创·淘宝授权店</td><td>备选：XMOS <strong>XVF3800</strong> USB 评估板；优先 UAC 即插即用</td>
+          </tr>
+          <tr>
+            <td>B3</td><td>毫米波雷达</td><td>云帆瑞达 / 迈睿</td>
+            <td><strong>R60ABD1</strong>（存在+微动）或 <strong>R60AFD1</strong>（存在+跌倒辅助）</td><td>1</td>
+            <td>厂家店 / 立创相关代理</td><td>UART 115200 8N1；只写“R60A”不够，必须带后缀子型号</td>
+          </tr>
+          <tr>
+            <td>B4</td><td>电容触摸</td><td>Adafruit（或兼容真 I²C 模块）</td>
+            <td><strong>MPR121</strong> 12 键（I²C 地址常 0x5A）</td><td>1</td>
+            <td>Adafruit / 立创 / 正规电子商城</td><td><strong>禁止</strong>未确认的 TTP229-BSF 假 I²C</td>
+          </tr>
+          <tr>
+            <td>B5</td><td>触摸电极</td><td>通用辅材</td>
+            <td>铜箔胶带 / 导电布 + 杜邦线</td><td>若干</td>
+            <td>淘宝辅材店 / 立创</td><td>贴外壳内侧</td>
+          </tr>
+          <tr>
+            <td>B6</td><td>IMU</td><td>InvenSense 方案模块 / SparkFun</td>
+            <td><strong>MPU-6050</strong>（GY-521）或 <strong>ICM-20948</strong>（SparkFun）</td><td>1</td>
+            <td>立创 / SparkFun 授权店</td><td>倾倒检测；MPU6050 地址常 0x68</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>4.3 安全执行与交互（W1）</h3>
+      <table>
+        <thead>
+          <tr><th>序号</th><th>名称</th><th>厂家 / 品牌</th><th>定型型号</th><th>数量</th><th>建议渠道</th><th>备注</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>C1</td><td>安全 MCU</td><td>Espressif 乐鑫</td>
+            <td><strong>ESP32-WROOM-32 DevKitC</strong>（30/38 针）</td><td>1</td>
+            <td>立创 / 乐鑫授权代理</td><td>安全岛：触摸/IMU/灯/急停/看门狗</td>
+          </tr>
+          <tr>
+            <td>C2</td><td>灯带</td><td>WorldSemi 方案（WS2812B）</td>
+            <td><strong>WS2812B 60灯/米</strong>，裁 16～24 灯圆环 + <strong>乳白扩散罩</strong></td><td>1套</td>
+            <td>立创 / 灯带专营店</td><td>禁止频闪；仅呼吸/柔蓝；<strong>禁止 PCA9685 直驱</strong></td>
+          </tr>
+          <tr>
+            <td>C3</td><td>电平转换</td><td>TI 逻辑（或兼容模块）</td>
+            <td><strong>SN74AHCT125N</strong> 或成品模块板</td><td>1</td>
+            <td>立创 / Digi-Key / 贸泽</td><td>3.3V→5V 驱动 WS2812 数据线</td>
+          </tr>
+          <tr>
+            <td>C4</td><td>阻容</td><td>通用</td>
+            <td>330Ω×1；1000μF/6.3V×1</td><td>各1</td>
+            <td>立创</td><td>紧靠灯带供电端</td>
+          </tr>
+          <tr>
+            <td>C5</td><td>功放</td><td>通用 PAM 模块</td>
+            <td><strong>PAM8403</strong> 5V 功放板（带电位器）</td><td>1</td>
+            <td>立创 / 淘宝电子模块店</td><td>电位器先拧约 40% 硬件限幅</td>
+          </tr>
+          <tr>
+            <td>C6</td><td>扬声器</td><td>通用全频</td>
+            <td><strong>3W 4Ω</strong>，直径约 40～52mm</td><td>1</td>
+            <td>淘宝音响配件 / 立创</td><td>柔和音色优先</td>
+          </tr>
+          <tr>
+            <td>C7</td><td>音频线</td><td>通用</td>
+            <td>3.5mm 公头 → PAM8403 输入</td><td>1</td>
+            <td>任意</td><td>接 RDK 耳机口</td>
+          </tr>
+          <tr>
+            <td>C8</td><td>急停开关</td><td>通用工控</td>
+            <td><strong>蘑菇头急停 22mm</strong>，<strong>NC+NO 双触点</strong></td><td>1</td>
+            <td>工控店 / 立创</td><td>NC 切负载；NO 给 ESP32</td>
+          </tr>
+          <tr>
+            <td>C9</td><td>继电器</td><td>通用模块</td>
+            <td><strong>5V 继电器模块</strong>（光耦隔离，高电平触发）</td><td>1</td>
+            <td>立创 / 淘宝模块店</td><td>切断灯带+功放受控 5V</td>
+          </tr>
+          <tr>
+            <td>C10</td><td>MOSFET（可选）</td><td>Infineon / AOS 等</td>
+            <td><strong>IRL540N</strong> 或 <strong>AO3400</strong> + 驱动</td><td>1</td>
+            <td>立创</td><td>可替代继电器做静音/切电</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>4.4 通信与供电（W1）</h3>
+      <table>
+        <thead>
+          <tr><th>序号</th><th>名称</th><th>厂家 / 品牌</th><th>定型型号</th><th>数量</th><th>建议渠道</th><th>备注</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>D1</td><td>4G 模组</td><td>广和通 Fibocom</td>
+            <td><strong>L610-CN</strong> Cat.1 <strong>开发板</strong>（USB 转串口 + SMA 天线）</td><td>1</td>
+            <td>广和通代理 / 合宙等物联网店（确认是 L610-CN）</td><td>MQTT；独立粗线供电</td>
+          </tr>
+          <tr>
+            <td>D2</td><td>物联网卡</td><td>移动 / 联通</td>
+            <td>Nano SIM，<strong>Cat.1</strong> 套餐</td><td>1</td>
+            <td>运营商物联网 / 卡商</td><td>按 MQTT 接入地选运营商</td>
+          </tr>
+          <tr>
+            <td>D3</td><td>USB Hub</td><td>品牌有源 Hub</td>
+            <td><strong>有源 USB3.0 4 口</strong>，外接电源 ≥5V/2A</td><td>1</td>
+            <td>京东自营（绿联/优越者等有源 USB3）</td><td>相机/麦/L610 全部挂 Hub</td>
+          </tr>
+          <tr>
+            <td>D4</td><td>电池</td><td>正规电芯组装厂</td>
+            <td><strong>12V / 3S（约 12.6V）锂电池组</strong> + <strong>BMS</strong>，建议 ≥10Ah</td><td>1</td>
+            <td>正规电池店（带出厂检测）</td><td>与儿童可触区隔离</td>
+          </tr>
+          <tr>
+            <td>D5</td><td>降压模块</td><td>同步整流成品模块</td>
+            <td><strong>12V→5V ≥8A</strong>（优先 8～10A；勿只用小电流 MP1584）</td><td>1</td>
+            <td>立创 / 电源模块店</td><td>整机 5V 主轨</td>
+          </tr>
+          <tr>
+            <td>D6</td><td>总开关</td><td>通用</td>
+            <td>船型开关 <strong>12V/10A</strong></td><td>1</td>
+            <td>立创</td><td>电池总断</td>
+          </tr>
+          <tr>
+            <td>D7</td><td>保险丝</td><td>通用 5×20mm</td>
+            <td>12V 主路 <strong>7.5A</strong>；5V 主路 <strong>8A</strong>；灯带支路 <strong>3A</strong></td><td>各1</td>
+            <td>立创</td><td>含保险座</td>
+          </tr>
+          <tr>
+            <td>D8</td><td>USB-TTL</td><td>WCH / Silicon Labs</td>
+            <td><strong>CH340</strong> 或 <strong>CP2102</strong></td><td>1</td>
+            <td>立创</td><td>调试 ESP32 / 雷达串口</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>4.5 明确不采购</h3>
+      <p>舵机、云台、<strong>PCA9685</strong>（本方案不用于驱 WS2812）、未核验 Linux 驱动的 Windows-only 相机、杂牌非高耐久 TF、只写“R60A”不带后缀的模糊雷达。</p>
+
+      <h3>4.6 实验室验证仪器（W8–W9 采购或学校实验室借用）</h3>
+      <table>
+        <thead>
+          <tr><th>名称</th><th>厂家 / 规格要求</th><th>是否必需</th><th>用途</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>数字示波器</td><td>任意主流品牌（Rigol / Siglent / Keysight 等），<strong>≥4 通道、≥50 MHz</strong></td><td>必需</td><td>故障关断时序</td></tr>
+          <tr><td>积分声级计</td><td>符合 <strong>IEC 61672-1 Class 2</strong>（二级）；建议配 94 dB@1 kHz 校准器</td><td>必需</td><td>声压标定；<strong>禁止手机 App</strong></td></tr>
+          <tr><td>数字照度计</td><td>量程至少 <strong>0.1～100000 lx</strong></td><td>必需</td><td>灯环眼位照度</td></tr>
+          <tr><td>屏幕亮度计</td><td>显示器校色仪 / 亮度计（cd/m²）</td><td>建议</td><td>屏幕亮度；无则只写眼位照度</td></tr>
+          <tr><td>数字角度仪 / 倾角台</td><td>可稳定制造 &gt;45°</td><td>必需</td><td>倾倒故障</td></tr>
+          <tr><td>UART 断线开关</td><td>拨动开关 / 端子转接板</td><td>必需</td><td>通信中断故障</td></tr>
+          <tr><td>可调直流电源</td><td>0～15 V，限流约 10 A</td><td>建议</td><td>替代电池台架供电</td></tr>
+          <tr><td>5V 电子负载</td><td>3～5 A</td><td>建议</td><td>继电器带载断开</td></tr>
+        </tbody>
+      </table>
+      <p class="muted">完整接线与烧录见仓库 <code>docs/HARDWARE_WIRING_FLASH.md</code>。</p>
     </section>
 
     <section class="block" id="wiring">
